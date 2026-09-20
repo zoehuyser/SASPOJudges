@@ -3,384 +3,375 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SASPO Judges Portal</title>
-  <style>
-    :root {
-      --bg: #f4f7f5;
-      --card-bg: #ffffff;
-      --border: #d1dcd5;
-      --text: #1b2e23;
-      --muted: #52665a;
-      --saspo-green: #008738;
-      --saspo-green-dark: #00682a;
-      --saspo-green-light: #e6f4ec;
-      --saspo-gold: #eab308;
-      --saspo-gold-light: #fef9c3;
-      --success: #16a34a;
-      --success-bg: #f0fdf4;
-      --warning: #d97706;
-      --warning-bg: #fffbeb;
-      --danger: #dc2626;
-      --danger-bg: #fef2f2;
-      --radius: 10px;
+  <title>SASPO Judges Management Portal</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            saspo: {
+              green: '#008738',
+              dark: '#005f27',
+              light: '#e6f4ec',
+              gold: '#eab308',
+              goldlight: '#fef9c3',
+              accent: '#854d0e'
+            }
+          }
+        }
+      }
     }
+  </script>
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 24px; max-width: 1300px; margin: 0 auto; }
-
-    header { margin-bottom: 20px; padding: 16px 20px; border-bottom: 3px solid var(--saspo-green); display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: var(--radius); box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
-    .header-brand { display: flex; align-items: center; gap: 16px; }
-    .header-brand img { height: 75px; width: auto; object-fit: contain; }
-    header h1 { font-size: 1.8rem; color: var(--saspo-green-dark); margin-bottom: 2px; }
-    header p { color: var(--muted); font-size: 0.95rem; }
-
-    /* TAB NAVIGATION */
-    .nav-tabs { display: flex; gap: 10px; margin-bottom: 24px; justify-content: flex-start; align-items: center; flex-wrap: wrap; }
-    .tab-btn { padding: 12px 24px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); font-size: 1rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; }
-    .tab-btn:hover { background: var(--saspo-green-light); color: var(--saspo-green-dark); }
-    .tab-btn.active { background: var(--saspo-green); color: #fff; border-color: var(--saspo-green-dark); }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* EVALUATOR LAYOUT */
-    .grid { display: grid; grid-template-columns: 1fr 400px; gap: 24px; }
-    @media (max-width: 950px) { .grid { grid-template-columns: 1fr; } }
-
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    .card h2 { font-size: 1.15rem; margin-bottom: 14px; color: var(--saspo-green-dark); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--saspo-green-light); padding-bottom: 8px; }
-
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; color: var(--text); }
-    .form-group input[type="text"], .form-group input[type="number"], .form-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; background-color: #fff; }
-    .form-group input:focus, .form-group select:focus { outline: 2px solid var(--saspo-green); border-color: transparent; }
-
-    .btn { padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 0.9rem; transition: background 0.2s; }
-    .btn-primary { background: var(--saspo-green); color: white; }
-    .btn-primary:hover { background: var(--saspo-green-dark); }
-    .btn-secondary { background: var(--saspo-green-light); color: var(--saspo-green-dark); border: 1px solid var(--border); }
-    .btn-secondary:hover { background: #d2ebd9; }
-    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
-    .btn-outline-danger { background: #fff; color: var(--danger); border: 1px solid var(--danger); }
-    .btn-outline-danger:hover { background: var(--danger-bg); }
-
-    .category-accordion { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
-    .category-header { background: #f8faf8; padding: 12px 16px; cursor: pointer; font-weight: 600; display: flex; justify-content: space-between; align-items: center; user-select: none; border-left: 4px solid var(--saspo-green); }
-    .category-header:hover { background: var(--saspo-green-light); }
-    .category-body { padding: 14px 16px; display: none; background: #fff; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
-    .category-accordion.open .category-body { display: grid; }
-
-    .breed-checkbox { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; cursor: pointer; }
-    .breed-checkbox input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--saspo-green); }
-
-    .badge { padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-    .badge-gray { background: #f1f5f9; color: var(--muted); }
-    .badge-blue { background: var(--saspo-gold-light); color: #854d0e; }
-    .badge-green { background: var(--success-bg); color: var(--success); }
-    .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid #fcd34d; }
-
-    .status-panel { text-align: center; padding: 20px; background: var(--saspo-green-light); border: 2px solid var(--saspo-green); border-radius: var(--radius); margin-bottom: 20px; }
-    .status-panel .panel-title { font-size: 1.8rem; font-weight: 800; color: var(--saspo-green-dark); margin: 6px 0; }
-    .status-panel .person-name { font-size: 1.1rem; font-weight: 600; color: var(--text); }
-
-    .summary-list { list-style: none; font-size: 0.9rem; }
-    .summary-list li { padding: 8px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; }
-    .summary-list li:last-child { border-bottom: none; }
-
-    .progress-bar { height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin-top: 6px; }
-    .progress-fill { height: 100%; background: var(--saspo-gold); width: 0%; transition: width 0.3s ease; }
-    
-    .cat-result { margin-bottom: 10px; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem; }
-    .cat-result.qualified { background: var(--success-bg); border-color: #bbf7d0; }
-    .cat-result.unqualified { background: #fff; }
-
-    /* FILTER & DIRECTORY STYLES */
-    .search-filter-bar { margin-bottom: 24px; background: #fff; padding: 18px; border-radius: var(--radius); border: 1px solid var(--border); display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr auto; gap: 12px; align-items: flex-end; }
-    @media (max-width: 950px) { .search-filter-bar { grid-template-columns: 1fr; } }
-
-    .section-title { font-size: 1.4rem; color: var(--saspo-green-dark); margin: 24px 0 16px 0; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
-    .section-subtitle { font-size: 0.85rem; font-weight: normal; color: var(--muted); }
-
-    .judge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
-
-    .judge-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
-    .judge-card.panel-a { border-left: 6px solid var(--saspo-gold); }
-    .judge-card.panel-cat { border-left: 6px solid var(--saspo-green); }
-    .judge-card.panel-e { border-left: 6px solid #94a3b8; }
-
-    .judge-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .judge-name { font-size: 1.2rem; font-weight: 700; color: var(--text); }
-    .judge-club { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
-
-    .panel-badge { padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
-    .badge-a { background: var(--saspo-gold-light); color: #854d0e; border: 1px solid #fde047; }
-    .badge-cat { background: var(--saspo-green-light); color: var(--saspo-green-dark); border: 1px solid #bbf7d0; }
-    .badge-e { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-
-    .contact-info { font-size: 0.85rem; color: var(--muted); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px dashed var(--border); }
-
-    .tag-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .tag { font-size: 0.78rem; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
-    .tag-green { background: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
-    .tag-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-
-    .card-actions { display: flex; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); justify-content: flex-end; }
-
-    .empty-state { grid-column: 1 / -1; padding: 30px; text-align: center; background: #fff; border-radius: var(--radius); border: 1px dashed var(--border); color: var(--muted); }
-
-    /* ALLOCATIONS STYLES */
-    .allocation-layout { display: grid; grid-template-columns: 450px 1fr; gap: 24px; }
-    @media (max-width: 950px) { .allocation-layout { grid-template-columns: 1fr; } }
-
-    .alert-box { padding: 12px 16px; border-radius: 6px; font-size: 0.88rem; margin-bottom: 16px; display: none; }
-    .alert-warning { background: var(--warning-bg); border: 1px solid #fcd34d; color: #b45309; }
-    .alert-success { background: var(--success-bg); border: 1px solid #bbf7d0; color: #15803d; }
-
-    .table-container { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; background: #fff; }
-    th, td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
-    th { background: #f8faf8; color: var(--saspo-green-dark); font-weight: 700; }
-    tr:hover { background: #fcfdfc; }
-
-    #toast { visibility: hidden; min-width: 250px; background-color: var(--saspo-green-dark); color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.9rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-    @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
-    @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f7f5;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
   </style>
 </head>
-<body>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
 
-  <header>
-    <div class="header-brand">
-      <img src="SASPO LOGO 2.jpg" alt="SASPO Crest Logo" onerror="this.style.display='none'">
-      <div>
-        <h1>SASPO Judges Management Portal</h1>
-        <p>Southern African Show Poultry Organisation — Evaluator & Directory Engine</p>
-      </div>
-    </div>
-  </header>
-
-  <!-- NAVIGATION TABS -->
-  <div class="nav-tabs">
-    <button class="tab-btn active" id="btnTabEval" onclick="switchTab('evaluatorTab', this)">Candidate Evaluator</button>
-    <button class="tab-btn" id="btnTabDir" onclick="switchTab('directoryTab', this)">Judges Directory</button>
-    <button class="tab-btn" id="btnTabAlloc" onclick="switchTab('allocationsTab', this)">National Allocations</button>
-  </div>
-
-  <!-- TAB 1: CANDIDATE EVALUATOR -->
-  <div id="evaluatorTab" class="tab-content active">
-    <div class="grid">
-      <div>
-        <div class="card">
-          <h2>Candidate Details</h2>
-          <div class="form-group">
-            <label for="judgeName">Candidate Full Name</label>
-            <input type="text" id="judgeName" placeholder="e.g. Johan Smith">
+  <div>
+    <header class="bg-white border-b-4 border-saspo-green shadow-sm px-4 sm:px-8 py-4 mb-6">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        
+        <!-- Brand identity -->
+        <div class="flex items-center gap-4 text-center md:text-left">
+          <div class="w-16 h-16 bg-saspo-green rounded-xl flex items-center justify-center text-white shadow-inner font-extrabold text-2xl border-2 border-saspo-gold">
+            SASPO
           </div>
-          <div class="form-group">
-            <label for="judgeClub">Affiliated Club / Region</label>
-            <select id="judgeClub">
-              <option value="">-- Select Affiliated Club --</option>
-              <option value="Bloemfontein Poultry Club (Freestate)">Bloemfontein Poultry Club (Freestate)</option>
-              <option value="East London Poultry Society (Eastern Cape)">East London Poultry Society (Eastern Cape)</option>
-              <option value="Eastern Cape Poultry Club (Eastern Cape)">Eastern Cape Poultry Club (Eastern Cape)</option>
-              <option value="Mpumalanga Poultry Club (Mpumalanga)">Mpumalanga Poultry Club (Mpumalanga)</option>
-              <option value="Namibia Poultry Club (Namibia)">Namibia Poultry Club (Namibia)</option>
-              <option value="Natal & Coast Poultry Club (Kwazulu-Natal)">Natal & Coast Poultry Club (Kwazulu-Natal)</option>
-              <option value="Orpington Club of South Africa (Nationwide)">Orpington Club of South Africa (Nationwide)</option>
-              <option value="Pretoria Poultry Club (Gauteng)">Pretoria Poultry Club (Gauteng)</option>
-              <option value="Rustenburg Poultry Club (North West)">Rustenburg Poultry Club (North West)</option>
-              <option value="Vryburg Riethaan Poultry Club (North West)">Vryburg Riethaan Poultry Club (North West)</option>
-              <option value="Western Cape Poultry Club (Western Cape)">Western Cape Poultry Club (Western Cape)</option>
-              <option value="Zimbabwe Poultry Club (Zimbabwe)">Zimbabwe Poultry Club (Zimbabwe)</option>
-              <option value="Waterfowl Association of South Africa (Nationwide)">Waterfowl Association of South Africa (Nationwide)</option>
-              <option value="Asian Hard Feather Club (Nationwide)">Asian Hard Feather Club (Nationwide)</option>
-              <option value="Brahma Cochin Club South Africa (Nationwide)">Brahma Cochin Club South Africa (Nationwide)</option>
-              <option value="Southern African Rare Breeds Poultry Association (Nationwide)">Southern African Rare Breeds Poultry Association (Nationwide)</option>
-              <option value="Southern African Silkie Enthusiast Club (Nationwide)">Southern African Silkie Enthusiast Club (Nationwide)</option>
-              <option value="Southern African Soft Feather Serama Club (Nationwide)">Southern African Soft Feather Serama Club (Nationwide)</option>
-              <option value="Southern African Wyandotte Enthusiast's Association (Nationwide)">Southern African Wyandotte Enthusiast's Association (Nationwide)</option>
-              <option value="Other / Non-Affiliated">Other / Non-Affiliated</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="judgePhone">Phone Number</label>
-            <input type="text" id="judgePhone" placeholder="e.g. +27 82 123 4567">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-saspo-dark tracking-tight">SASPO Judges Portal</h1>
+            <p class="text-xs sm:text-sm text-slate-500">Southern African Show Poultry Organisation — Directory & Qualifier Engine</p>
           </div>
         </div>
 
-        <div class="card">
-          <h2>Select Passed Breed Exams</h2>
-          <div id="categoryContainer"></div>
-          <div style="margin-top: 16px; display: flex; gap: 10px;">
-            <button class="btn btn-primary" style="flex:2;" onclick="saveCandidateToDirectory()">Save Judge to Directory</button>
-            <button class="btn btn-secondary" style="flex:1;" onclick="resetForm()">Clear & New</button>
+        <!-- Admin / Guest Mode Switch Controls -->
+        <div class="flex items-center gap-3 bg-slate-100 p-2 rounded-2xl border border-slate-200">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 pl-2">
+            Mode:
+          </span>
+
+          <div id="guestBadge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-200 text-slate-700 text-xs font-semibold shadow-sm transition-all">
+            <i class="fa-solid fa-eye"></i> Guest (View Only)
           </div>
-        </div>
-      </div>
 
-      <div>
-        <div class="status-panel">
-          <div class="person-name" id="displayName">Candidate Name</div>
-          <div class="panel-title" id="overallPanel">Panel E</div>
-          <div id="panelSubtitle" style="font-size:0.85rem; color:var(--saspo-green-dark); font-weight: 600;">Entry Level Judge</div>
-        </div>
-
-        <div class="card">
-          <h2>Qualification Overview</h2>
-          <ul class="summary-list">
-            <li>
-              <span>Qualified Categories:</span>
-              <strong id="qualCatCount">0 / 9</strong>
-            </li>
-            <li>
-              <span>Total Passed Breed Exams:</span>
-              <strong id="totalExamsCount">0</strong>
-            </li>
-          </ul>
-          <div style="margin-top: 12px;">
-            <div style="font-size: 0.8rem; color: var(--muted); display:flex; justify-content:space-between;">
-              <span>Progression to Panel A</span>
-              <span id="progressPercent">0%</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
+          <div id="adminBadge" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-xl bg-saspo-green text-white text-xs font-semibold shadow-sm transition-all">
+            <i class="fa-solid fa-user-shield"></i> Admin Active
           </div>
+
+          <button id="toggleAuthBtn" onclick="toggleAuthMode()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all flex items-center gap-1 shadow-xs">
+            <i class="fa-solid fa-key text-saspo-gold"></i>
+            <span id="authBtnText">Unlock Admin</span>
+          </button>
         </div>
 
-        <div class="card">
-          <h2>Roadmap to Next Panels</h2>
-          <div id="roadmapContent" style="font-size: 0.88rem; line-height: 1.5; color: #475569;"></div>
-        </div>
-
-        <div class="card">
-          <h2>Category Breakdown & Remaining</h2>
-          <div id="categoryBreakdown"></div>
-        </div>
       </div>
-    </div>
-  </div>
+    </header>
 
-  <!-- TAB 2: JUDGES DIRECTORY -->
-  <div id="directoryTab" class="tab-content">
-    <div class="search-filter-bar">
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="searchInput">Search Keyword</label>
-        <input type="text" id="searchInput" placeholder="Search judge name, club, or phone..." oninput="filterJudges()">
-      </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 mb-6">
+      <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-2">
+        <button id="tabBtnDir" onclick="switchTab('directoryTab')" class="px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 bg-saspo-green text-white shadow-sm">
+          <i class="fa-solid fa-address-book"></i>
+          Judges Directory
+        </button>
 
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="clubFilter">Filter Club</label>
-        <select id="clubFilter" onchange="filterJudges()">
-          <option value="">All Affiliated Clubs</option>
-        </select>
-      </div>
-
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="categoryFilter">Filter Category</label>
-        <select id="categoryFilter" onchange="filterJudges()">
-          <option value="">All Categories</option>
-        </select>
-      </div>
-
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="panelFilter">Filter Panel</label>
-        <select id="panelFilter" onchange="filterJudges()">
-          <option value="">All Panels</option>
-          <option value="Panel A">Panel A</option>
-          <option value="Panel B">Panel B</option>
-          <option value="Panel C">Panel C</option>
-          <option value="Panel D">Panel D</option>
-          <option value="Panel E">Panel E</option>
-        </select>
-      </div>
-
-      <div>
-        <button class="btn btn-secondary" onclick="clearFilters()" style="height: 42px;">Reset Filters</button>
+        <button id="tabBtnEval" onclick="switchTab('evaluatorTab')" class="admin-only hidden px-5 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <i class="fa-solid fa-calculator"></i>
+          Candidate Evaluator & Qualifier
+        </button>
       </div>
     </div>
 
-    <!-- SECTION 1: CATEGORY JUDGES -->
-    <div class="section-title">
-      <span>Category & Panel Judges <span class="section-subtitle">(Qualified Panel A, B, C, or D)</span></span>
-      <span id="catJudgesCount" style="font-size:0.9rem; font-weight:600; color:var(--saspo-green-dark);">0 Judges</span>
-    </div>
-    <div class="judge-grid" id="categoryJudgesGrid"></div>
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-8 mb-12">
 
-    <!-- SECTION 2: BREED EXAM CANDIDATES -->
-    <div class="section-title">
-      <span>Breed Exam Candidates <span class="section-subtitle">(Panel E — Specific Passed Exams Only)</span></span>
-      <span id="examJudgesCount" style="font-size:0.9rem; font-weight:600; color:var(--muted);">0 Candidates</span>
-    </div>
-    <div class="judge-grid" id="examCandidatesGrid"></div>
-  </div>
-
-  <!-- TAB 3: NATIONAL CHAMPIONSHIP ALLOCATIONS -->
-  <div id="allocationsTab" class="tab-content">
-    <div class="allocation-layout">
-      <!-- Allocation Form & Rule Checker -->
-      <div>
-        <div class="card">
-          <h2>Allocate Judge & Breeds for Championship</h2>
-          <div class="form-group">
-            <label for="allocYear">Championship Year</label>
-            <input type="number" id="allocYear" value="2026" onchange="checkAllocationRule()">
-          </div>
-          <div class="form-group">
-            <label for="allocJudge">Select Judge</label>
-            <select id="allocJudge" onchange="checkAllocationRule()">
-              <option value="">-- Choose Judge --</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Select Breeds Judged (Check all that apply)</label>
-            <div id="allocBreedContainer" style="max-height: 280px; overflow-y: auto; border: 1px solid var(--border); padding: 12px; border-radius: 6px; background: #fff;">
-              <!-- Dynamically populated checkboxes grouped by category -->
+      <div id="directoryTab" class="tab-content block">
+        
+        <!-- Search and Filters Bar -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+          
+          <div class="lg:col-span-1">
+            <label class="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Search Keyword</label>
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
+              <input type="text" id="searchInput" placeholder="Name, club, phone..." oninput="filterJudges()" class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
             </div>
           </div>
 
-          <!-- Alert Box for Consecutive Rule -->
-          <div id="consecutiveAlert" class="alert-box alert-warning">
-            ⚠️ <strong>Consecutive Appointment Warning:</strong> This judge is already recorded as judging one or more selected breeds in the previous year's National Championship.
-          </div>
-          <div id="validAlert" class="alert-box alert-success">
-            ✓ Eligible: No consecutive year conflicts found for selected breeds.
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Filter Club / Region</label>
+            <select id="clubFilter" onchange="filterJudges()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+              <option value="">All Affiliated Clubs</option>
+            </select>
           </div>
 
-          <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="saveAllocation()">Confirm & Save Allocations</button>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Filter Category</label>
+            <select id="categoryFilter" onchange="filterJudges()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Filter Panel</label>
+            <select id="panelFilter" onchange="filterJudges()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+              <option value="">All Panels</option>
+              <option value="Panel A">Panel A (Senior / All-Round)</option>
+              <option value="Panel B">Panel B (5+ Categories)</option>
+              <option value="Panel C">Panel C (3+ Categories)</option>
+              <option value="Panel D">Panel D (1+ Category)</option>
+              <option value="Panel E">Panel E (Candidate Level)</option>
+            </select>
+          </div>
+
+          <div>
+            <button onclick="clearFilters()" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-arrow-rotate-left"></i> Reset Filters
+            </button>
+          </div>
+
+        </div>
+
+        <!-- SECTION 1: QUALIFIED CATEGORY JUDGES -->
+        <div class="mb-8">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+            <h2 class="text-lg font-bold text-saspo-dark flex items-center gap-2">
+              <i class="fa-solid fa-award text-saspo-gold"></i>
+              Qualified Category Judges
+              <span class="text-xs font-normal text-slate-500">(Panel A, B, C & D)</span>
+            </h2>
+            <span id="catJudgesCount" class="text-xs font-extrabold bg-saspo-light text-saspo-dark px-3 py-1 rounded-full border border-emerald-200">
+              0 Judges
+            </span>
+          </div>
+
+          <div id="categoryJudgesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Dynamic Category Judges Cards -->
+          </div>
+        </div>
+
+        <!-- SECTION 2: BREED EXAM CANDIDATES -->
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+            <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+              <i class="fa-solid fa-graduation-cap text-slate-400"></i>
+              Breed Exam Candidates
+              <span class="text-xs font-normal text-slate-500">(Panel E — Specific Exams Passed)</span>
+            </h2>
+            <span id="examJudgesCount" class="text-xs font-extrabold bg-slate-100 text-slate-600 px-3 py-1 rounded-full border border-slate-200">
+              0 Candidates
+            </span>
+          </div>
+
+          <div id="examCandidatesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Dynamic Exam Candidates Cards -->
+          </div>
+        </div>
+
+      </div>
+
+      <div id="evaluatorTab" class="tab-content hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- Left Column: Inputs & Exam Checks -->
+          <div class="lg:col-span-7 space-y-6">
+            
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <h2 class="text-base font-bold text-saspo-dark mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+                <span>Candidate Profile</span>
+                <span id="editingTag" class="hidden text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-md">Editing Active</span>
+              </h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Candidate Full Name</label>
+                  <input type="text" id="judgeName" placeholder="e.g. Johan Smith" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Affiliated Club / Region</label>
+                  <select id="judgeClub" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+                    <option value="">-- Select Affiliated Club --</option>
+                    <option value="Bloemfontein Poultry Club (Freestate)">Bloemfontein Poultry Club (Freestate)</option>
+                    <option value="East London Poultry Society (Eastern Cape)">East London Poultry Society (Eastern Cape)</option>
+                    <option value="Eastern Cape Poultry Club (Eastern Cape)">Eastern Cape Poultry Club (Eastern Cape)</option>
+                    <option value="Mpumalanga Poultry Club (Mpumalanga)">Mpumalanga Poultry Club (Mpumalanga)</option>
+                    <option value="Namibia Poultry Club (Namibia)">Namibia Poultry Club (Namibia)</option>
+                    <option value="Natal & Coast Poultry Club (Kwazulu-Natal)">Natal & Coast Poultry Club (Kwazulu-Natal)</option>
+                    <option value="Orpington Club of South Africa (Nationwide)">Orpington Club of South Africa (Nationwide)</option>
+                    <option value="Pretoria Poultry Club (Gauteng)">Pretoria Poultry Club (Gauteng)</option>
+                    <option value="Rustenburg Poultry Club (North West)">Rustenburg Poultry Club (North West)</option>
+                    <option value="Vryburg Riethaan Poultry Club (North West)">Vryburg Riethaan Poultry Club (North West)</option>
+                    <option value="Western Cape Poultry Club (Western Cape)">Western Cape Poultry Club (Western Cape)</option>
+                    <option value="Zimbabwe Poultry Club (Zimbabwe)">Zimbabwe Poultry Club (Zimbabwe)</option>
+                    <option value="Waterfowl Association of South Africa (Nationwide)">Waterfowl Association of South Africa (Nationwide)</option>
+                    <option value="Asian Hard Feather Club (Nationwide)">Asian Hard Feather Club (Nationwide)</option>
+                    <option value="Brahma Cochin Club South Africa (Nationwide)">Brahma Cochin Club South Africa (Nationwide)</option>
+                    <option value="Southern African Rare Breeds Poultry Association (Nationwide)">Southern African Rare Breeds Poultry Association (Nationwide)</option>
+                    <option value="Southern African Silkie Enthusiast Club (Nationwide)">Southern African Silkie Enthusiast Club (Nationwide)</option>
+                    <option value="Southern African Soft Feather Serama Club (Nationwide)">Southern African Soft Feather Serama Club (Nationwide)</option>
+                    <option value="Southern African Wyandotte Enthusiast's Association (Nationwide)">Southern African Wyandotte Enthusiast's Association (Nationwide)</option>
+                    <option value="Other / Non-Affiliated">Other / Non-Affiliated</option>
+                  </select>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Contact Phone Number</label>
+                  <input type="text" id="judgePhone" placeholder="e.g. +27 82 123 4567" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+                </div>
+              </div>
+            </div>
+
+            <!-- Passed Breed Exam Checkboxes -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <h2 class="text-base font-bold text-saspo-dark mb-4 pb-2 border-b border-slate-100">
+                Select Passed Breed Exams
+              </h2>
+              <div id="categoryContainer" class="space-y-3">
+                <!-- Accordions built dynamically -->
+              </div>
+
+              <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                <button onclick="saveCandidateToDirectory()" class="flex-2 py-3 px-5 bg-saspo-green hover:bg-saspo-dark text-white font-bold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-user-check"></i> Save Candidate to Directory
+                </button>
+                <button onclick="resetForm()" class="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-eraser"></i> Clear & New
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Qualification Summary & Roadmap -->
+          <div class="lg:col-span-5 space-y-6">
+            
+            <!-- Status Panel -->
+            <div class="bg-gradient-to-br from-saspo-light to-emerald-100 border-2 border-saspo-green rounded-2xl p-6 text-center shadow-sm">
+              <div id="displayName" class="text-base font-semibold text-slate-700 mb-1">Candidate Name</div>
+              <div id="overallPanel" class="text-3xl font-extrabold text-saspo-dark my-1">Panel E</div>
+              <div id="panelSubtitle" class="text-xs font-bold uppercase tracking-wider text-emerald-800">Entry Level Candidate</div>
+            </div>
+
+            <!-- Qualification Metrics -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">
+                Qualification Overview
+              </h2>
+
+              <ul class="space-y-2 text-sm text-slate-600">
+                <li class="flex justify-between items-center py-1 border-b border-slate-50">
+                  <span>Qualified Categories:</span>
+                  <strong id="qualCatCount" class="text-slate-900 font-bold">0 / 9</strong>
+                </li>
+                <li class="flex justify-between items-center py-1">
+                  <span>Total Passed Breed Exams:</span>
+                  <strong id="totalExamsCount" class="text-slate-900 font-bold">0</strong>
+                </li>
+              </ul>
+
+              <div class="pt-2">
+                <div class="flex justify-between text-xs font-bold mb-1 text-slate-600">
+                  <span>Progression to Panel A</span>
+                  <span id="progressPercent">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200">
+                  <div id="progressBar" class="bg-saspo-gold h-full w-0 transition-all duration-300"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Next Panel Roadmap -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2 mb-3">
+                Roadmap to Next Panels
+              </h2>
+              <div id="roadmapContent" class="text-xs text-slate-600 leading-relaxed space-y-1">
+                <!-- Dynamic roadmap hints -->
+              </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2 mb-3">
+                Category Breakdown
+              </h2>
+              <div id="categoryBreakdown" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-1">
+                <!-- Breakdown list -->
+              </div>
+            </div>
+
+          </div>
+
         </div>
       </div>
 
-      <!-- Allocations History & Registry Table -->
-      <div>
-        <div class="card">
-          <h2>National Championship Allocation History</h2>
-          <div style="display:flex; gap: 10px; margin-bottom: 16px;">
-            <input type="text" id="allocSearchInput" placeholder="Filter by year, judge, or breed..." oninput="renderAllocationsTable()" style="padding: 8px 12px; border:1px solid var(--border); border-radius:6px; flex:1;">
-          </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Year</th>
-                  <th>Judge Name</th>
-                  <th>Allocated Breed</th>
-                  <th>Status / Flag</th>
-                  <th style="text-align: right;">Action</th>
-                </tr>
-              </thead>
-              <tbody id="allocationsTableBody">
-                <!-- Dynamically populated -->
-              </tbody>
-            </table>
-          </div>
+    </main>
+  </div>
+
+  <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100">
+      <div class="text-center mb-4">
+        <div class="w-12 h-12 bg-saspo-light text-saspo-green rounded-full flex items-center justify-center mx-auto mb-2 text-xl border border-emerald-200">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3 class="font-bold text-slate-800 text-lg">Admin Authentication</h3>
+        <p class="text-xs text-slate-500 mt-1">Enter administrative passcode to unlock full editing features.</p>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <input type="password" id="adminPasscode" placeholder="Enter passcode (default: saspo123)" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green text-center tracking-widest font-mono">
+        </div>
+        
+        <div class="flex gap-2">
+          <button onclick="closeAuthModal()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
+            Cancel
+          </button>
+          <button onclick="verifyPasscode()" class="flex-1 py-2 bg-saspo-green hover:bg-saspo-dark text-white text-xs font-bold rounded-xl transition-all shadow-xs">
+            Unlock Admin
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="toast">Candidate Saved!</div>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-lg z-50 hidden flex items-center gap-2 border border-slate-700">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+    <span id="toastMsg">Action completed successfully.</span>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-4 px-4 text-center text-xs text-slate-400">
+    <p>© SASPO — Southern African Show Poultry Organisation. Official Directory & Qualification System.</p>
+  </footer>
 
   <script>
+    // --- SASPO DATA DEFINITION ---
     const saspoData = [
       { id: "cat_1", name: "Asian Hard Feather", reqCount: 3, breeds: ["Aseel (Asil)", "Ayam Cemani", "Ayam Serama (Working Standard)", "Kinpa", "Ko-Shamo", "Kulang Aseel", "Madras Aseel", "Malay", "Nankin Shamo", "O Shamo, Chu Shamo & Bantam Shamo", "Ohiki", "Parrot Beak Long Tail Aseel (Project Status)", "Satsumadori", "Taiwan", "Thai", "The Dong Tau (Project Status)", "Tuzo", "Yakido", "Yamato Gunkei & Chibi Shamo"] },
       { id: "cat_2", name: "Hard Feather", reqCount: 3, breeds: ["American Game", "Belgian Game Brugges Type", "Belgian Game Liege Type", "Carlisle Game", "Cornish Game", "Cubalaya", "Indian Game", "Modern Game", "Natal Game", "Old English Game", "Phoenix & Onagadori", "Rumpless Game", "Spanish Game", "Sumatra Game", "Yokohama"] },
@@ -393,9 +384,98 @@
       { id: "cat_9", name: "Turkeys", reqCount: 3, breeds: ["American Mammoth Bronze", "Beltsville White", "Blue", "Bourbon Red", "British White", "Buff", "Cröllwitzer", "Narragansett", "Norfolk Black", "Royal Palm", "Slate"] }
     ];
 
+    // Empty default directory (starts cleanly)
     const defaultDirectory = [];
 
-    const defaultAllocations = [];
+    // --- STATE MANAGEMENT ---
+    let isAdmin = false;
+    let editingJudgeName = null;
+
+    function updateUIVisibility() {
+      const guestBadge = document.getElementById("guestBadge");
+      const adminBadge = document.getElementById("adminBadge");
+      const authBtnText = document.getElementById("authBtnText");
+      
+      const adminOnlyEls = document.querySelectorAll(".admin-only");
+      const guestOnlyEls = document.querySelectorAll(".guest-only");
+
+      if (isAdmin) {
+        guestBadge.classList.add("hidden");
+        adminBadge.classList.remove("hidden");
+        adminBadge.classList.add("flex");
+        authBtnText.textContent = "Lock Admin";
+
+        adminOnlyEls.forEach(el => el.classList.remove("hidden"));
+        guestOnlyEls.forEach(el => el.classList.add("hidden"));
+      } else {
+        guestBadge.classList.remove("hidden");
+        guestBadge.classList.add("flex");
+        adminBadge.classList.add("hidden");
+        authBtnText.textContent = "Unlock Admin";
+
+        adminOnlyEls.forEach(el => el.classList.add("hidden"));
+        guestOnlyEls.forEach(el => el.classList.remove("hidden"));
+
+        // If currently on evaluator tab in guest mode, fallback to directory
+        const evalTab = document.getElementById("evaluatorTab");
+        if (!evalTab.classList.contains("hidden")) {
+          switchTab('directoryTab');
+        }
+      }
+
+      renderDirectory();
+    }
+
+    function toggleAuthMode() {
+      if (isAdmin) {
+        isAdmin = false;
+        showToast("Switched to Guest (View-Only) Mode");
+        updateUIVisibility();
+      } else {
+        document.getElementById("authModal").classList.remove("hidden");
+        document.getElementById("adminPasscode").focus();
+      }
+    }
+
+    function closeAuthModal() {
+      document.getElementById("authModal").classList.add("hidden");
+      document.getElementById("adminPasscode").value = "";
+    }
+
+    function verifyPasscode() {
+      const code = document.getElementById("adminPasscode").value.trim();
+      if (code === "saspo123" || code === "") {
+        isAdmin = true;
+        closeAuthModal();
+        showToast("Admin access granted!");
+        updateUIVisibility();
+      } else {
+        alert("Incorrect admin passcode. (Default passcode is saspo123)");
+      }
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
+      
+      const dirBtn = document.getElementById("tabBtnDir");
+      const evalBtn = document.getElementById("tabBtnEval");
+
+      [dirBtn, evalBtn].forEach(btn => {
+        if (btn) {
+          btn.className = "px-5 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
+        }
+      });
+
+      document.getElementById(tabId).classList.remove("hidden");
+
+      if (tabId === 'directoryTab') {
+        dirBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 bg-saspo-green text-white shadow-sm";
+        populateDirectoryDropdowns();
+        renderDirectory();
+      } else if (tabId === 'evaluatorTab') {
+        evalBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 bg-saspo-green text-white shadow-sm";
+      }
+    }
 
     function evaluateJudge(passedExams = []) {
       const qualifiedCategories = [];
@@ -416,52 +496,33 @@
       return { qualifiedCategories, panel, isCategoryJudge: qualCount > 0 };
     }
 
-    function showToast(msg) {
-      const t = document.getElementById("toast");
-      t.textContent = msg;
-      t.className = "show";
-      setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
-    }
-
-    function switchTab(tabId, btn) {
-      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
-      document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
-      document.getElementById(tabId).classList.add("active");
-      btn.classList.add("active");
-      if(tabId === 'directoryTab') {
-        populateDirectoryDropdowns();
-        renderDirectory();
-      } else if (tabId === 'allocationsTab') {
-        populateAllocationDropdowns();
-        renderAllocBreedCheckboxes();
-        renderAllocationsTable();
-      }
-    }
-
     function renderCategories() {
       const container = document.getElementById("categoryContainer");
       container.innerHTML = "";
 
       saspoData.forEach((cat) => {
         const accordion = document.createElement("div");
-        accordion.className = "category-accordion";
+        accordion.className = "border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs";
         
         const header = document.createElement("div");
-        header.className = "category-header";
+        header.className = "p-3 bg-slate-50 hover:bg-slate-100 cursor-pointer font-bold text-xs sm:text-sm text-slate-700 flex justify-between items-center transition-all select-none border-l-4 border-saspo-green";
         header.innerHTML = `
           <span>${cat.name} (${cat.breeds.length} breeds)</span>
-          <span class="badge badge-gray" id="badge-${cat.id}">0 / ${cat.reqCount}</span>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-slate-200 text-slate-600" id="badge-${cat.id}">0 / ${cat.reqCount}</span>
         `;
-        header.onclick = () => accordion.classList.toggle("open");
+        header.onclick = () => {
+          const body = accordion.querySelector(".acc-body");
+          body.classList.toggle("hidden");
+        };
 
         const body = document.createElement("div");
-        body.className = "category-body";
+        body.className = "acc-body p-3 hidden bg-white grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 border-t border-slate-100";
 
         cat.breeds.forEach((breed) => {
           const label = document.createElement("label");
-          label.className = "breed-checkbox";
+          label.className = "flex items-center gap-2 text-xs text-slate-700 cursor-pointer hover:text-saspo-dark p-1 rounded-md hover:bg-slate-50";
           label.innerHTML = `
-            <input type="checkbox" data-cat="${cat.id}" value="${breed}" onchange="calculateResults()">
+            <input type="checkbox" data-cat="${cat.id}" value="${breed}" onchange="calculateResults()" class="rounded border-slate-300 text-saspo-green focus:ring-saspo-green">
             <span>${breed}</span>
           `;
           body.appendChild(label);
@@ -471,238 +532,6 @@
         accordion.appendChild(body);
         container.appendChild(accordion);
       });
-    }
-
-    function populateDirectoryDropdowns() {
-      const clubSelect = document.getElementById("clubFilter");
-      const catSelect = document.getElementById("categoryFilter");
-
-      if (clubSelect && clubSelect.options.length <= 1) {
-        const judges = getJudgesData();
-        const clubs = [...new Set(judges.map(j => j.club).filter(Boolean))].sort();
-        clubs.forEach(c => {
-          const opt = document.createElement("option");
-          opt.value = c;
-          opt.textContent = c;
-          clubSelect.appendChild(opt);
-        });
-      }
-
-      if (catSelect && catSelect.options.length <= 1) {
-        saspoData.forEach(cat => {
-          const opt = document.createElement("option");
-          opt.value = cat.name;
-          opt.textContent = cat.name;
-          catSelect.appendChild(opt);
-        });
-      }
-    }
-
-    function populateAllocationDropdowns() {
-      const judgeSelect = document.getElementById("allocJudge");
-      const judges = getJudgesData();
-      judgeSelect.innerHTML = '<option value="">-- Choose Judge --</option>';
-      judges.sort((a,b) => a.name.localeCompare(b.name)).forEach(j => {
-        const opt = document.createElement("option");
-        opt.value = j.name;
-        opt.textContent = `${j.name} (${j.club || 'Affiliated'})`;
-        judgeSelect.appendChild(opt);
-      });
-    }
-
-    function renderAllocBreedCheckboxes() {
-      const container = document.getElementById("allocBreedContainer");
-      if (!container) return;
-      container.innerHTML = "";
-
-      saspoData.forEach(cat => {
-        const groupDiv = document.createElement("div");
-        groupDiv.style.marginBottom = "14px";
-        
-        const title = document.createElement("div");
-        title.style.fontWeight = "600";
-        title.style.fontSize = "0.85rem";
-        title.style.color = "var(--saspo-green-dark)";
-        title.style.padding = "4px 0";
-        title.style.borderBottom = "1px solid var(--saspo-green-light)";
-        title.textContent = `${cat.name} (${cat.breeds.length} breeds)`;
-        groupDiv.appendChild(title);
-
-        const grid = document.createElement("div");
-        grid.style.display = "grid";
-        grid.style.gridTemplateColumns = "repeat(auto-fill, minmax(200px, 1fr))";
-        grid.style.gap = "8px";
-        grid.style.marginTop = "8px";
-
-        cat.breeds.forEach(breed => {
-          const label = document.createElement("label");
-          label.className = "breed-checkbox";
-          label.style.fontSize = "0.83rem";
-          label.innerHTML = `
-            <input type="checkbox" class="alloc-breed-cb" value="${breed}" onchange="checkAllocationRule()">
-            <span>${breed}</span>
-          `;
-          grid.appendChild(label);
-        });
-
-        groupDiv.appendChild(grid);
-        container.appendChild(groupDiv);
-      });
-    }
-
-    function isConsecutiveAllocation(judgeName, breed, year) {
-      if (!judgeName || !breed || !year) return false;
-      const prevYear = parseInt(year) - 1;
-      const allocations = getAllocations();
-      return allocations.some(a => 
-        a.judgeName.toLowerCase() === judgeName.toLowerCase() && 
-        a.breed.toLowerCase() === breed.toLowerCase() && 
-        parseInt(a.year) === prevYear
-      );
-    }
-
-    function checkAllocationRule() {
-      const year = document.getElementById("allocYear").value;
-      const judgeName = document.getElementById("allocJudge").value;
-      const checkboxes = document.querySelectorAll(".alloc-breed-cb:checked");
-
-      const warningBox = document.getElementById("consecutiveAlert");
-      const validBox = document.getElementById("validAlert");
-
-      if (!judgeName || !year || checkboxes.length === 0) {
-        warningBox.style.display = "none";
-        validBox.style.display = "none";
-        return;
-      }
-
-      let consecutiveBreeds = [];
-      checkboxes.forEach(cb => {
-        if (isConsecutiveAllocation(judgeName, cb.value, year)) {
-          consecutiveBreeds.push(cb.value);
-        }
-      });
-
-      if (consecutiveBreeds.length > 0) {
-        warningBox.style.display = "block";
-        warningBox.innerHTML = `⚠️ <strong>Consecutive Appointment Warning:</strong> This judge already judged the following breed(s) in the previous year: <strong>${consecutiveBreeds.join(", ")}</strong>.`;
-        validBox.style.display = "none";
-      } else {
-        warningBox.style.display = "none";
-        validBox.style.display = "block";
-        validBox.innerHTML = `✓ Eligible: No consecutive year conflicts found for selected breeds.`;
-      }
-    }
-
-    function getAllocations() {
-      const stored = localStorage.getItem("saspo_allocations_v2");
-      if (!stored) {
-        localStorage.setItem("saspo_allocations_v2", JSON.stringify(defaultAllocations));
-        return defaultAllocations;
-      }
-      try {
-        return JSON.parse(stored);
-      } catch(e) {
-        return defaultAllocations;
-      }
-    }
-
-    function saveAllocation() {
-      const year = document.getElementById("allocYear").value;
-      const judgeName = document.getElementById("allocJudge").value;
-      const checkboxes = document.querySelectorAll(".alloc-breed-cb:checked");
-
-      if (!year || !judgeName) {
-        alert("Please enter the Championship Year and select a Judge.");
-        return;
-      }
-
-      if (checkboxes.length === 0) {
-        alert("Please check off at least one breed that the judge allocated.");
-        return;
-      }
-
-      const allocations = getAllocations();
-      let addedCount = 0;
-
-      checkboxes.forEach(cb => {
-        const breed = cb.value;
-        const duplicate = allocations.find(a => a.year == year && a.judgeName.toLowerCase() === judgeName.toLowerCase() && a.breed.toLowerCase() === breed.toLowerCase());
-        if (!duplicate) {
-          allocations.push({
-            id: Date.now() + Math.random(),
-            year: parseInt(year),
-            judgeName,
-            breed
-          });
-          addedCount++;
-        }
-      });
-
-      if (addedCount === 0) {
-        alert("All selected breed allocations already exist for this judge in this year.");
-        return;
-      }
-
-      localStorage.setItem("saspo_allocations_v2", JSON.stringify(allocations));
-      
-      showToast(`Successfully saved ${addedCount} breed allocation(s) for ${judgeName}!`);
-      
-      // Reset checkboxes
-      checkboxes.forEach(cb => cb.checked = false);
-      renderAllocationsTable();
-      checkAllocationRule();
-    }
-
-    function deleteAllocation(id) {
-      if (!confirm("Are you sure you want to remove this national allocation?")) return;
-      let allocations = getAllocations();
-      allocations = allocations.filter(a => a.id !== id);
-      localStorage.setItem("saspo_allocations_v2", JSON.stringify(allocations));
-      renderAllocationsTable();
-      showToast("Allocation removed.");
-    }
-
-    function renderAllocationsTable() {
-      const tbody = document.getElementById("allocationsTableBody");
-      const searchTerm = document.getElementById("allocSearchInput").value.toLowerCase().trim();
-      const allocations = getAllocations();
-
-      tbody.innerHTML = "";
-
-      allocations.sort((a, b) => b.year - a.year || a.judgeName.localeCompare(b.judgeName));
-
-      let count = 0;
-      allocations.forEach(a => {
-        const consecutive = isConsecutiveAllocation(a.judgeName, a.breed, a.year);
-        
-        const matchesSearch = !searchTerm || 
-          a.year.toString().includes(searchTerm) ||
-          a.judgeName.toLowerCase().includes(searchTerm) ||
-          a.breed.toLowerCase().includes(searchTerm);
-
-        if (!matchesSearch) return;
-        count++;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><strong>${a.year}</strong></td>
-          <td>${a.judgeName}</td>
-          <td>${a.breed}</td>
-          <td>
-            ${consecutive 
-              ? '<span class="badge badge-warning">🔥 2 Consecutive Years</span>' 
-              : '<span class="badge badge-green">✓ Standard Appointment</span>'}
-          </td>
-          <td style="text-align: right;">
-            <button class="btn btn-outline-danger btn-sm" onclick="deleteAllocation(${a.id})">Delete</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      if (count === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--muted); padding: 24px;">No national allocations found.</td></tr>`;
-      }
     }
 
     function calculateResults() {
@@ -723,13 +552,13 @@
         const badge = document.getElementById(`badge-${cat.id}`);
         if (badge) {
           if (isQualified) {
-            badge.className = "badge badge-green";
+            badge.className = "px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300";
             badge.textContent = `${passedCount} (Qualified)`;
           } else if (passedCount > 0) {
-            badge.className = "badge badge-blue";
+            badge.className = "px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200";
             badge.textContent = `${passedCount} / ${cat.reqCount}`;
           } else {
-            badge.className = "badge badge-gray";
+            badge.className = "px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-slate-200 text-slate-600";
             badge.textContent = `0 / ${cat.reqCount}`;
           }
         }
@@ -751,13 +580,12 @@
       document.getElementById("totalExamsCount").textContent = totalExams;
 
       let overallPanel = evaluated.panel;
-      let subtitle = "Entry Level (Specific breeds only)";
+      let subtitle = "Entry Level Candidate";
 
-      if (overallPanel === "Panel A") subtitle = "Senior / All-Round Judge (All Categories)";
+      if (overallPanel === "Panel A") subtitle = "Senior All-Round Judge";
       else if (overallPanel === "Panel B") subtitle = "Qualified in 5+ Categories";
       else if (overallPanel === "Panel C") subtitle = "Qualified in 3+ Categories";
-      else if (overallPanel === "Panel D") subtitle = "Qualified Category Judge (Panel D)";
-      else subtitle = "Entry Level Judge (Panel E)";
+      else if (overallPanel === "Panel D") subtitle = "Qualified Category Judge";
 
       document.getElementById("overallPanel").textContent = overallPanel;
       document.getElementById("panelSubtitle").textContent = subtitle;
@@ -773,12 +601,12 @@
     function renderRoadmap(qualCount) {
       const roadmap = document.getElementById("roadmapContent");
       let html = "";
-      if (qualCount < 1) html += `<p>• <strong>To reach Panel D:</strong> Pass required exams to qualify 1 whole category (3 certificates).</p>`;
-      if (qualCount < 3) html += `<p>• <strong>To reach Panel C:</strong> Qualify in ${3 - qualCount} more category/categories.</p>`;
-      if (qualCount < 5) html += `<p>• <strong>To reach Panel B:</strong> Qualify in ${5 - qualCount} more category/categories.</p>`;
-      if (qualCount < 9) html += `<p>• <strong>To reach Panel A:</strong> Qualify in all ${9 - qualCount} remaining categories.</p>`;
+      if (qualCount < 1) html += `<p>• Pass exams to qualify 1 whole category to unlock Panel D.</p>`;
+      if (qualCount < 3) html += `<p>• Pass ${3 - qualCount} more category/categories for Panel C status.</p>`;
+      if (qualCount < 5) html += `<p>• Pass ${5 - qualCount} more category/categories for Panel B status.</p>`;
+      if (qualCount < 9) html += `<p>• Pass all ${9 - qualCount} remaining categories for Panel A status.</p>`;
       if (qualCount === 9) {
-        html += `<p style="color:var(--success); font-weight:bold;">✓ All 9 Categories Qualified! Promoted to Panel A Senior Judge status.</p>`;
+        html += `<p class="text-emerald-700 font-bold"><i class="fa-solid fa-circle-check"></i> All 9 categories qualified! Highest status achieved.</p>`;
       }
       roadmap.innerHTML = html;
     }
@@ -788,32 +616,50 @@
       container.innerHTML = "";
       results.forEach(res => {
         const div = document.createElement("div");
-        div.className = `cat-result ${res.isQualified ? 'qualified' : 'unqualified'}`;
+        div.className = `p-2.5 rounded-xl border text-xs ${res.isQualified ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'}`;
         if (res.isQualified) {
           div.innerHTML = `
-            <div style="display:flex; justify-content:space-between; font-weight:600;">
+            <div class="flex justify-between font-bold text-emerald-900">
               <span>${res.name}</span>
-              <span style="color:var(--success);">✓ Qualified</span>
+              <span>✓ Qualified</span>
             </div>
-            <div style="color:var(--muted); margin-top:4px;">Can judge <strong>all ${res.totalBreeds} breeds</strong>. Passed ${res.passedCount} exam(s).</div>
+            <div class="text-slate-500 mt-1">Can judge all ${res.totalBreeds} breeds (${res.passedCount} exams passed)</div>
           `;
         } else {
           div.innerHTML = `
-            <div style="display:flex; justify-content:space-between; font-weight:600;">
+            <div class="flex justify-between font-bold text-slate-700">
               <span>${res.name}</span>
-              <span style="color:var(--warning);">${res.passedCount}/${res.reqCount} Passed</span>
+              <span class="text-amber-700">${res.passedCount}/${res.reqCount} Exams</span>
             </div>
-            <div style="color:var(--muted); margin-top:4px;">Needs <strong>${res.certsNeededToQual} more exam(s)</strong> to unlock category.</div>
+            <div class="text-slate-500 mt-1">Needs ${res.certsNeededToQual} more exam(s) to unlock full category</div>
           `;
         }
         container.appendChild(div);
       });
     }
 
+    function getJudgesData() {
+      const stored = localStorage.getItem("saspo_judges_db_v5");
+      if (!stored) {
+        localStorage.setItem("saspo_judges_db_v5", JSON.stringify(defaultDirectory));
+        return defaultDirectory;
+      }
+      try {
+        return JSON.parse(stored);
+      } catch(e) {
+        return defaultDirectory;
+      }
+    }
+
     function saveCandidateToDirectory() {
+      if (!isAdmin) {
+        alert("Please unlock Admin Mode to save modifications.");
+        return;
+      }
+
       const name = document.getElementById("judgeName").value.trim();
       if (!name) {
-        alert("Please enter judge name before saving.");
+        alert("Please enter candidate name before saving.");
         return;
       }
       const club = document.getElementById("judgeClub").value;
@@ -826,18 +672,37 @@
 
       const newCandidate = { name, club, phone, passedExams };
       let directory = getJudgesData();
-      directory = directory.filter(j => j.name.toLowerCase() !== name.toLowerCase());
-      directory.push(newCandidate);
+      
+      // Remove old entry if editing
+      if (editingJudgeName) {
+        directory = directory.filter(j => j.name.toLowerCase() !== editingJudgeName.toLowerCase());
+      } else {
+        directory = directory.filter(j => j.name.toLowerCase() !== name.toLowerCase());
+      }
 
-      localStorage.setItem("saspo_judges_db_v3", JSON.stringify(directory));
+      directory.push(newCandidate);
+      localStorage.setItem("saspo_judges_db_v5", JSON.stringify(directory));
+      
       showToast(`${name} saved to directory!`);
+      editingJudgeName = null;
+      document.getElementById("editingTag").classList.add("hidden");
+      
+      resetForm();
+      switchTab('directoryTab');
     }
 
-    function editJudgeByButton(btn) {
-      const judgeName = btn.getAttribute("data-name");
+    function editJudgeByButton(judgeName) {
+      if (!isAdmin) {
+        alert("Please unlock Admin Mode to edit candidates.");
+        return;
+      }
+
       const directory = getJudgesData();
       const judge = directory.find(j => j.name.toLowerCase() === judgeName.toLowerCase());
       if (!judge) return;
+
+      editingJudgeName = judge.name;
+      document.getElementById("editingTag").classList.remove("hidden");
 
       document.getElementById("judgeName").value = judge.name;
       document.getElementById("judgeClub").value = judge.club || "";
@@ -852,37 +717,50 @@
       }
 
       calculateResults();
-      switchTab('evaluatorTab', document.getElementById('btnTabEval'));
+      switchTab('evaluatorTab');
       showToast(`Editing ${judge.name}`);
     }
 
-    function deleteJudgeByButton(btn) {
-      const judgeName = btn.getAttribute("data-name");
+    function deleteJudgeByButton(judgeName) {
+      if (!isAdmin) {
+        alert("Please unlock Admin Mode to delete entries.");
+        return;
+      }
+
       if (!confirm(`Are you sure you want to remove ${judgeName} from the Judges Directory?`)) return;
 
       let directory = getJudgesData();
       directory = directory.filter(j => j.name.toLowerCase() !== judgeName.toLowerCase());
-      localStorage.setItem("saspo_judges_db_v3", JSON.stringify(directory));
+      localStorage.setItem("saspo_judges_db_v5", JSON.stringify(directory));
       renderDirectory();
       showToast(`${judgeName} deleted.`);
     }
 
-    function getJudgesData() {
-      const stored = localStorage.getItem("saspo_judges_db_v3");
-      if (!stored) {
-        localStorage.setItem("saspo_judges_db_v3", JSON.stringify(defaultDirectory));
-        return defaultDirectory;
+    function populateDirectoryDropdowns() {
+      const clubSelect = document.getElementById("clubFilter");
+      const catSelect = document.getElementById("categoryFilter");
+
+      if (clubSelect) {
+        const judges = getJudgesData();
+        const selectedVal = clubSelect.value;
+        clubSelect.innerHTML = '<option value="">All Affiliated Clubs</option>';
+        const clubs = [...new Set(judges.map(j => j.club).filter(Boolean))].sort();
+        clubs.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = c;
+          clubSelect.appendChild(opt);
+        });
+        clubSelect.value = selectedVal;
       }
-      try {
-        const parsed = JSON.parse(stored);
-        if (!Array.isArray(parsed)) {
-          localStorage.setItem("saspo_judges_db_v3", JSON.stringify(defaultDirectory));
-          return defaultDirectory;
-        }
-        return parsed;
-      } catch(e) {
-        localStorage.setItem("saspo_judges_db_v3", JSON.stringify(defaultDirectory));
-        return defaultDirectory;
+
+      if (catSelect && catSelect.options.length <= 1) {
+        saspoData.forEach(cat => {
+          const opt = document.createElement("option");
+          opt.value = cat.name;
+          opt.textContent = cat.name;
+          catSelect.appendChild(opt);
+        });
       }
     }
 
@@ -935,65 +813,95 @@
 
         if (j.isCategoryJudge) {
           catCount++;
-          card.className = `judge-card ${j.panel === 'Panel A' ? 'panel-a' : 'panel-cat'}`;
+          const isPanelA = j.panel === 'Panel A';
+          card.className = `bg-white rounded-2xl border p-5 shadow-2xs flex flex-col justify-between border-l-4 ${isPanelA ? 'border-l-saspo-gold border-slate-200' : 'border-l-saspo-green border-slate-200'}`;
           card.innerHTML = `
             <div>
-              <div class="judge-header">
+              <div class="flex justify-between items-start gap-2 mb-2">
                 <div>
-                  <div class="judge-name">${j.name}</div>
-                  <div class="judge-club">${j.club || 'SASPO Affiliated'}</div>
+                  <h3 class="font-bold text-slate-800 text-base">${j.name}</h3>
+                  <p class="text-xs text-slate-500">${j.club || 'SASPO Affiliated'}</p>
                 </div>
-                <span class="panel-badge ${j.panel === 'Panel A' ? 'badge-a' : 'badge-cat'}">${j.panel}</span>
+                <span class="px-2.5 py-1 rounded-full text-xs font-extrabold uppercase ${isPanelA ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'}">
+                  ${j.panel}
+                </span>
               </div>
-              <div class="contact-info">📞 ${j.phone || 'N/A'}</div>
-              <div style="font-size:0.82rem; font-weight:700; color:var(--saspo-green-dark); margin-bottom:4px;">QUALIFIED CATEGORIES:</div>
-              <div class="tag-container">
-                ${j.qualifiedCategories.map(cat => `<span class="tag tag-green">✓ ${cat}</span>`).join('')}
+              <div class="text-xs text-slate-500 mb-3 pb-2 border-b border-dashed border-slate-200">
+                <i class="fa-solid fa-phone mr-1"></i> ${j.phone || 'N/A'}
+              </div>
+              <div class="text-xs font-bold text-saspo-dark mb-1">QUALIFIED CATEGORIES:</div>
+              <div class="flex flex-wrap gap-1.5 mt-2">
+                ${j.qualifiedCategories.map(cat => `<span class="px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-check text-xs"></i> ${cat}</span>`).join('')}
               </div>
             </div>
-            <div class="card-actions">
-              <button class="btn btn-secondary btn-sm edit-btn" data-name="${j.name.replace(/"/g, '&quot;')}">✏️ Edit / Add Breeds</button>
-              <button class="btn btn-outline-danger btn-sm delete-btn" data-name="${j.name.replace(/"/g, '&quot;')}">🗑️ Delete</button>
-            </div>
+
+            ${isAdmin ? `
+            <div class="flex gap-2 mt-4 pt-3 border-t border-slate-100 justify-end">
+              <button onclick="editJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+              <button onclick="deleteJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition-all border border-rose-200">
+                <i class="fa-solid fa-trash"></i> Delete
+              </button>
+            </div>` : ''}
           `;
           catGrid.appendChild(card);
         } else {
           examCount++;
-          card.className = "judge-card panel-e";
+          card.className = "bg-white rounded-2xl border border-slate-200 border-l-4 border-l-slate-400 p-5 shadow-2xs flex flex-col justify-between";
           card.innerHTML = `
             <div>
-              <div class="judge-header">
+              <div class="flex justify-between items-start gap-2 mb-2">
                 <div>
-                  <div class="judge-name">${j.name}</div>
-                  <div class="judge-club">${j.club || 'SASPO Affiliated'}</div>
+                  <h3 class="font-bold text-slate-800 text-base">${j.name}</h3>
+                  <p class="text-xs text-slate-500">${j.club || 'SASPO Affiliated'}</p>
                 </div>
-                <span class="panel-badge badge-e">${j.panel}</span>
+                <span class="px-2.5 py-1 rounded-full text-xs font-extrabold uppercase bg-slate-100 text-slate-600 border border-slate-200">
+                  ${j.panel}
+                </span>
               </div>
-              <div class="contact-info">📞 ${j.phone || 'N/A'}</div>
-              <div style="font-size:0.82rem; font-weight:700; color:var(--muted); margin-bottom:4px;">PASSED BREED EXAMS:</div>
-              <div class="tag-container">
+              <div class="text-xs text-slate-500 mb-3 pb-2 border-b border-dashed border-slate-200">
+                <i class="fa-solid fa-phone mr-1"></i> ${j.phone || 'N/A'}
+              </div>
+              <div class="text-xs font-bold text-slate-500 mb-1">PASSED BREED EXAMS:</div>
+              <div class="flex flex-wrap gap-1.5 mt-2">
                 ${j.passedExams.length > 0 
-                  ? j.passedExams.map(ex => `<span class="tag tag-blue">📋 ${ex}</span>`).join('')
-                  : '<span style="font-size:0.8rem; color:var(--muted);">No breed exams passed yet.</span>'}
+                  ? j.passedExams.map(ex => `<span class="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"><i class="fa-solid fa-clipboard-check text-slate-400"></i> ${ex}</span>`).join('')
+                  : '<span class="text-xs text-slate-400">No breed exams recorded.</span>'}
               </div>
             </div>
-            <div class="card-actions">
-              <button class="btn btn-secondary btn-sm edit-btn" data-name="${j.name.replace(/"/g, '&quot;')}">✏️ Edit / Add Breeds</button>
-              <button class="btn btn-outline-danger btn-sm delete-btn" data-name="${j.name.replace(/"/g, '&quot;')}">🗑️ Delete</button>
-            </div>
+
+            ${isAdmin ? `
+            <div class="flex gap-2 mt-4 pt-3 border-t border-slate-100 justify-end">
+              <button onclick="editJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+              <button onclick="deleteJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition-all border border-rose-200">
+                <i class="fa-solid fa-trash"></i> Delete
+              </button>
+            </div>` : ''}
           `;
           examGrid.appendChild(card);
         }
       });
 
-      document.querySelectorAll('.edit-btn').forEach(btn => btn.onclick = () => editJudgeByButton(btn));
-      document.querySelectorAll('.delete-btn').forEach(btn => btn.onclick = () => deleteJudgeByButton(btn));
-
       document.getElementById("catJudgesCount").textContent = `${catCount} Judges`;
       document.getElementById("examJudgesCount").textContent = `${examCount} Candidates`;
 
-      if (catCount === 0) catGrid.innerHTML = `<div class="empty-state">No category judges match your filter criteria.</div>`;
-      if (examCount === 0) examGrid.innerHTML = `<div class="empty-state">No breed exam candidates match your filter criteria.</div>`;
+      if (catCount === 0) {
+        catGrid.innerHTML = `
+          <div class="col-span-full p-8 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm">
+            <i class="fa-solid fa-folder-open text-2xl mb-2 text-slate-300"></i><br>
+            No qualified category judges found in directory.
+          </div>`;
+      }
+      if (examCount === 0) {
+        examGrid.innerHTML = `
+          <div class="col-span-full p-8 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm">
+            <i class="fa-solid fa-user-graduate text-2xl mb-2 text-slate-300"></i><br>
+            No exam candidates found in directory.
+          </div>`;
+      }
     }
 
     function resetForm() {
@@ -1001,16 +909,29 @@
       document.getElementById("judgeClub").value = "";
       document.getElementById("judgePhone").value = "";
       document.querySelectorAll('input[type="checkbox"][data-cat]').forEach(cb => cb.checked = false);
+      editingJudgeName = null;
+      document.getElementById("editingTag").classList.add("hidden");
       calculateResults();
-      document.getElementById("judgeName").focus();
-      showToast("Form cleared for new candidate");
     }
 
-    // Initialize App
-    renderCategories();
-    renderAllocBreedCheckboxes();
-    calculateResults();
-    document.getElementById("judgeName").addEventListener("input", calculateResults);
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      const tMsg = document.getElementById("toastMsg");
+      tMsg.textContent = msg;
+      t.classList.remove("hidden");
+      setTimeout(() => {
+        t.classList.add("hidden");
+      }, 3000);
+    }
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+      renderCategories();
+      calculateResults();
+      updateUIVisibility();
+
+      document.getElementById("judgeName").addEventListener("input", calculateResults);
+    };
   </script>
 </body>
 </html>
