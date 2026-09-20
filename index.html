@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>SASPO Judges Management Portal</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -33,6 +33,7 @@
     body {
       font-family: 'Inter', sans-serif;
       background-color: #f4f7f5;
+      -webkit-tap-highlight-color: transparent;
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
@@ -49,40 +50,51 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
   </style>
 </head>
-<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+<body class="min-h-screen text-slate-800 flex flex-col justify-between pt-safe pb-safe pl-safe pr-safe">
 
   <div>
-    <header class="bg-white border-b-4 border-saspo-green shadow-sm px-4 sm:px-8 py-4 mb-6">
-      <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <header class="bg-white border-b-4 border-saspo-green shadow-sm px-3 sm:px-6 lg:px-8 py-3 sm:py-4 mb-4 sm:mb-6">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
         
         <!-- Brand identity -->
-        <div class="flex items-center gap-4 text-center md:text-left">
-          <div class="w-16 h-16 bg-saspo-green rounded-xl flex items-center justify-center text-white shadow-inner font-extrabold text-2xl border-2 border-saspo-gold">
+        <div class="flex items-center gap-3 sm:gap-4 text-center md:text-left w-full md:w-auto justify-center md:justify-start">
+          <div class="w-12 h-12 sm:w-16 sm:h-16 bg-saspo-green rounded-xl flex items-center justify-center text-white shadow-inner font-extrabold text-xl sm:text-2xl border-2 border-saspo-gold shrink-0">
             SASPO
           </div>
-          <div>
-            <h1 class="text-xl sm:text-2xl font-bold text-saspo-dark tracking-tight">SASPO Judges Portal</h1>
-            <p class="text-xs sm:text-sm text-slate-500">Southern African Show Poultry Organisation — Directory & Qualifier Engine</p>
+          <div class="text-left">
+            <h1 class="text-lg sm:text-2xl font-bold text-saspo-dark tracking-tight leading-tight">SASPO Judges Portal</h1>
+            <p class="text-[11px] sm:text-sm text-slate-500 leading-tight">Southern African Show Poultry Organisation</p>
           </div>
         </div>
 
         <!-- Admin / Guest Mode Switch Controls -->
-        <div class="flex items-center gap-3 bg-slate-100 p-2 rounded-2xl border border-slate-200">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 pl-2">
+        <div class="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 bg-slate-100 p-1.5 sm:p-2 rounded-2xl border border-slate-200 w-full md:w-auto overflow-x-auto">
+          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 pl-1.5 shrink-0">
             Mode:
           </span>
 
-          <div id="guestBadge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-200 text-slate-700 text-xs font-semibold shadow-sm transition-all">
-            <i class="fa-solid fa-eye"></i> Guest (View Only)
+          <div id="guestBadge" class="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 rounded-xl bg-slate-200 text-slate-700 text-xs font-semibold shadow-xs transition-all shrink-0">
+            <i class="fa-solid fa-eye text-xs"></i> <span>Guest (View)</span>
           </div>
 
-          <div id="adminBadge" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-xl bg-saspo-green text-white text-xs font-semibold shadow-sm transition-all">
-            <i class="fa-solid fa-user-shield"></i> Admin Active
+          <div id="adminBadge" class="hidden items-center gap-1.5 px-2.5 py-1.5 sm:px-3 rounded-xl bg-saspo-green text-white text-xs font-semibold shadow-xs transition-all shrink-0">
+            <i class="fa-solid fa-user-shield text-xs"></i> <span>Admin Active</span>
           </div>
 
-          <button id="toggleAuthBtn" onclick="toggleAuthMode()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all flex items-center gap-1 shadow-xs">
+          <button id="toggleAuthBtn" onclick="toggleAuthMode()" class="touch-target px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-all flex items-center justify-center gap-1.5 shadow-xs shrink-0">
             <i class="fa-solid fa-key text-saspo-gold"></i>
             <span id="authBtnText">Unlock Admin</span>
           </button>
@@ -91,53 +103,53 @@
       </div>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-8 mb-6">
-      <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-2">
-        <button id="tabBtnDir" onclick="switchTab('directoryTab')" class="px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 bg-saspo-green text-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mb-4 sm:mb-6">
+      <div class="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto no-scrollbar">
+        <button id="tabBtnDir" onclick="switchTab('directoryTab')" class="touch-target px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-saspo-green text-white shadow-xs shrink-0">
           <i class="fa-solid fa-address-book"></i>
           Judges Directory
         </button>
 
-        <button id="tabBtnEval" onclick="switchTab('evaluatorTab')" class="admin-only hidden px-5 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+        <button id="tabBtnEval" onclick="switchTab('evaluatorTab')" class="admin-only hidden touch-target px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:bg-slate-100 shrink-0">
           <i class="fa-solid fa-calculator"></i>
           Candidate Evaluator & Qualifier
         </button>
       </div>
     </div>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-8 mb-12">
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mb-8 sm:mb-12">
 
+      <!-- DIRECTORY TAB -->
       <div id="directoryTab" class="tab-content block">
         
         <!-- Search and Filters Bar -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+        <div class="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-xs mb-5 sm:mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 items-end">
           
           <div class="lg:col-span-1">
-            <label class="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Search Keyword</label>
+            <label class="block text-[11px] sm:text-xs font-bold text-slate-600 mb-1 sm:mb-1.5 uppercase">Search Keyword</label>
             <div class="relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
-              <input type="text" id="searchInput" placeholder="Name, club, phone..." oninput="filterJudges()" class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-400 text-xs sm:text-sm"></i>
+              <input type="text" id="searchInput" placeholder="Name, club, phone..." oninput="filterJudges()" class="touch-target w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Filter Club / Region</label>
-            <select id="clubFilter" onchange="filterJudges()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+            <label class="block text-[11px] sm:text-xs font-bold text-slate-600 mb-1 sm:mb-1.5 uppercase">Filter Club / Region</label>
+            <select id="clubFilter" onchange="filterJudges()" class="touch-target w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
               <option value="">All Affiliated Clubs</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Filter Category</label>
-            <select id="categoryFilter" onchange="filterJudges()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+            <label class="block text-[11px] sm:text-xs font-bold text-slate-600 mb-1 sm:mb-1.5 uppercase">Filter Category</label>
+            <select id="categoryFilter" onchange="filterJudges()" class="touch-target w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
               <option value="">All Categories</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Filter Panel</label>
-            <select id="panelFilter" onchange="filterJudges()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+            <label class="block text-[11px] sm:text-xs font-bold text-slate-600 mb-1 sm:mb-1.5 uppercase">Filter Panel</label>
+            <select id="panelFilter" onchange="filterJudges()" class="touch-target w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
               <option value="">All Panels</option>
               <option value="Panel A">Panel A (Senior / All-Round)</option>
               <option value="Panel B">Panel B (5+ Categories)</option>
@@ -148,7 +160,7 @@
           </div>
 
           <div>
-            <button onclick="clearFilters()" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2">
+            <button onclick="clearFilters()" class="touch-target w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2">
               <i class="fa-solid fa-arrow-rotate-left"></i> Reset Filters
             </button>
           </div>
@@ -156,37 +168,37 @@
         </div>
 
         <!-- SECTION 1: QUALIFIED CATEGORY JUDGES -->
-        <div class="mb-8">
-          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
-            <h2 class="text-lg font-bold text-saspo-dark flex items-center gap-2">
+        <div class="mb-6 sm:mb-8">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-2 sm:pb-3 mb-4 gap-1 sm:gap-0">
+            <h2 class="text-base sm:text-lg font-bold text-saspo-dark flex items-center gap-2">
               <i class="fa-solid fa-award text-saspo-gold"></i>
-              Qualified Category Judges
-              <span class="text-xs font-normal text-slate-500">(Panel A, B, C & D)</span>
+              <span>Qualified Category Judges</span>
+              <span class="text-[11px] sm:text-xs font-normal text-slate-500 hidden xs:inline">(Panels A - D)</span>
             </h2>
-            <span id="catJudgesCount" class="text-xs font-extrabold bg-saspo-light text-saspo-dark px-3 py-1 rounded-full border border-emerald-200">
+            <span id="catJudgesCount" class="self-start sm:self-auto text-[11px] sm:text-xs font-extrabold bg-saspo-light text-saspo-dark px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-emerald-200">
               0 Judges
             </span>
           </div>
 
-          <div id="categoryJudgesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div id="categoryJudgesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             <!-- Dynamic Category Judges Cards -->
           </div>
         </div>
 
         <!-- SECTION 2: BREED EXAM CANDIDATES -->
         <div>
-          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
-            <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-2 sm:pb-3 mb-4 gap-1 sm:gap-0">
+            <h2 class="text-base sm:text-lg font-bold text-slate-700 flex items-center gap-2">
               <i class="fa-solid fa-graduation-cap text-slate-400"></i>
-              Breed Exam Candidates
-              <span class="text-xs font-normal text-slate-500">(Panel E — Specific Exams Passed)</span>
+              <span>Breed Exam Candidates</span>
+              <span class="text-[11px] sm:text-xs font-normal text-slate-500 hidden xs:inline">(Panel E)</span>
             </h2>
-            <span id="examJudgesCount" class="text-xs font-extrabold bg-slate-100 text-slate-600 px-3 py-1 rounded-full border border-slate-200">
+            <span id="examJudgesCount" class="self-start sm:self-auto text-[11px] sm:text-xs font-extrabold bg-slate-100 text-slate-600 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-slate-200">
               0 Candidates
             </span>
           </div>
 
-          <div id="examCandidatesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div id="examCandidatesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             <!-- Dynamic Exam Candidates Cards -->
           </div>
         </div>
@@ -194,26 +206,26 @@
       </div>
 
       <div id="evaluatorTab" class="tab-content hidden">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8">
           
           <!-- Left Column: Inputs & Exam Checks -->
-          <div class="lg:col-span-7 space-y-6">
+          <div class="lg:col-span-7 space-y-4 sm:space-y-6">
             
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <h2 class="text-base font-bold text-saspo-dark mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
+              <h2 class="text-sm sm:text-base font-bold text-saspo-dark mb-3 sm:mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
                 <span>Candidate Profile</span>
-                <span id="editingTag" class="hidden text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-md">Editing Active</span>
+                <span id="editingTag" class="hidden text-[10px] sm:text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-md">Editing Active</span>
               </h2>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Candidate Full Name</label>
-                  <input type="text" id="judgeName" placeholder="e.g. Johan Smith" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div class="sm:col-span-1">
+                  <label class="block text-[11px] sm:text-xs font-bold text-slate-600 mb-1 uppercase">Candidate Full Name</label>
+                  <input type="text" id="judgeName" placeholder="e.g. Johan Smith" class="touch-target w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
                 </div>
 
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Affiliated Club / Region</label>
-                  <select id="judgeClub" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+                <div class="sm:col-span-1">
+                  <label class="block text-[11px] sm:text-xs font-bold text-slate-600 mb-1 uppercase">Affiliated Club / Region</label>
+                  <select id="judgeClub" class="touch-target w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
                     <option value="">-- Select Affiliated Club --</option>
                     <option value="Bloemfontein Poultry Club (Freestate)">Bloemfontein Poultry Club (Freestate)</option>
                     <option value="East London Poultry Society (Eastern Cape)">East London Poultry Society (Eastern Cape)</option>
@@ -238,27 +250,27 @@
                   </select>
                 </div>
 
-                <div class="md:col-span-2">
-                  <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Contact Phone Number</label>
-                  <input type="text" id="judgePhone" placeholder="e.g. +27 82 123 4567" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+                <div class="sm:col-span-2">
+                  <label class="block text-[11px] sm:text-xs font-bold text-slate-600 mb-1 uppercase">Contact Phone Number</label>
+                  <input type="text" id="judgePhone" placeholder="e.g. +27 82 123 4567" class="touch-target w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
                 </div>
               </div>
             </div>
 
             <!-- Passed Breed Exam Checkboxes -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <h2 class="text-base font-bold text-saspo-dark mb-4 pb-2 border-b border-slate-100">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
+              <h2 class="text-sm sm:text-base font-bold text-saspo-dark mb-3 sm:mb-4 pb-2 border-b border-slate-100">
                 Select Passed Breed Exams
               </h2>
-              <div id="categoryContainer" class="space-y-3">
+              <div id="categoryContainer" class="space-y-2.5 sm:space-y-3">
                 <!-- Accordions built dynamically -->
               </div>
 
-              <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                <button onclick="saveCandidateToDirectory()" class="flex-2 py-3 px-5 bg-saspo-green hover:bg-saspo-dark text-white font-bold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
+              <div class="mt-5 sm:mt-6 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+                <button onclick="saveCandidateToDirectory()" class="touch-target flex-2 py-3 px-5 bg-saspo-green hover:bg-saspo-dark active:bg-saspo-dark text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-xs flex items-center justify-center gap-2">
                   <i class="fa-solid fa-user-check"></i> Save Candidate to Directory
                 </button>
-                <button onclick="resetForm()" class="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2">
+                <button onclick="resetForm()" class="touch-target flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2">
                   <i class="fa-solid fa-eraser"></i> Clear & New
                 </button>
               </div>
@@ -267,22 +279,22 @@
           </div>
 
           <!-- Right Column: Qualification Summary & Roadmap -->
-          <div class="lg:col-span-5 space-y-6">
+          <div class="lg:col-span-5 space-y-4 sm:space-y-6">
             
             <!-- Status Panel -->
-            <div class="bg-gradient-to-br from-saspo-light to-emerald-100 border-2 border-saspo-green rounded-2xl p-6 text-center shadow-sm">
-              <div id="displayName" class="text-base font-semibold text-slate-700 mb-1">Candidate Name</div>
-              <div id="overallPanel" class="text-3xl font-extrabold text-saspo-dark my-1">Panel E</div>
-              <div id="panelSubtitle" class="text-xs font-bold uppercase tracking-wider text-emerald-800">Entry Level Candidate</div>
+            <div class="bg-gradient-to-br from-saspo-light to-emerald-100 border-2 border-saspo-green rounded-2xl p-4 sm:p-6 text-center shadow-xs">
+              <div id="displayName" class="text-sm sm:text-base font-semibold text-slate-700 mb-0.5">Candidate Name</div>
+              <div id="overallPanel" class="text-2xl sm:text-3xl font-extrabold text-saspo-dark my-1">Panel E</div>
+              <div id="panelSubtitle" class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-800">Entry Level Candidate</div>
             </div>
 
             <!-- Qualification Metrics -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-              <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3 sm:space-y-4">
+              <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">
                 Qualification Overview
               </h2>
 
-              <ul class="space-y-2 text-sm text-slate-600">
+              <ul class="space-y-2 text-xs sm:text-sm text-slate-600">
                 <li class="flex justify-between items-center py-1 border-b border-slate-50">
                   <span>Qualified Categories:</span>
                   <strong id="qualCatCount" class="text-slate-900 font-bold">0 / 9</strong>
@@ -293,7 +305,7 @@
                 </li>
               </ul>
 
-              <div class="pt-2">
+              <div class="pt-1 sm:pt-2">
                 <div class="flex justify-between text-xs font-bold mb-1 text-slate-600">
                   <span>Progression to Panel A</span>
                   <span id="progressPercent">0%</span>
@@ -305,8 +317,8 @@
             </div>
 
             <!-- Next Panel Roadmap -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2 mb-3">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
+              <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2 mb-2.5">
                 Roadmap to Next Panels
               </h2>
               <div id="roadmapContent" class="text-xs text-slate-600 leading-relaxed space-y-1">
@@ -315,11 +327,11 @@
             </div>
 
             <!-- Category Breakdown -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2 mb-3">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
+              <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2 mb-2.5">
                 Category Breakdown
               </h2>
-              <div id="categoryBreakdown" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-1">
+              <div id="categoryBreakdown" class="space-y-2 max-h-72 sm:max-h-80 overflow-y-auto custom-scrollbar pr-1">
                 <!-- Breakdown list -->
               </div>
             </div>
@@ -332,26 +344,26 @@
     </main>
   </div>
 
-  <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100">
+  <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-[92vw] sm:w-full p-5 sm:p-6 shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto">
       <div class="text-center mb-4">
         <div class="w-12 h-12 bg-saspo-light text-saspo-green rounded-full flex items-center justify-center mx-auto mb-2 text-xl border border-emerald-200">
           <i class="fa-solid fa-lock"></i>
         </div>
-        <h3 class="font-bold text-slate-800 text-lg">Admin Authentication</h3>
+        <h3 class="font-bold text-slate-800 text-base sm:text-lg">Admin Authentication</h3>
         <p class="text-xs text-slate-500 mt-1">Enter administrative passcode to unlock full editing features.</p>
       </div>
 
       <div class="space-y-3">
         <div>
-          <input type="password" id="adminPasscode" placeholder="Enter administrative passcode" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green text-center tracking-widest font-mono">
+          <input type="password" id="adminPasscode" placeholder="Enter administrative passcode" class="touch-target w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green text-center tracking-widest font-mono">
         </div>
         
         <div class="flex gap-2">
-          <button onclick="closeAuthModal()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
+          <button onclick="closeAuthModal()" class="touch-target flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
             Cancel
           </button>
-          <button onclick="verifyPasscode()" class="flex-1 py-2 bg-saspo-green hover:bg-saspo-dark text-white text-xs font-bold rounded-xl transition-all shadow-xs">
+          <button onclick="verifyPasscode()" class="touch-target flex-1 py-2.5 bg-saspo-green hover:bg-saspo-dark text-white text-xs font-bold rounded-xl transition-all shadow-xs">
             Unlock Admin
           </button>
         </div>
@@ -359,15 +371,13 @@
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-lg z-50 hidden flex items-center gap-2 border border-slate-700">
+  <div id="toast" class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 max-w-[90vw] bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-lg z-50 hidden flex items-center gap-2 border border-slate-700">
     <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
-    <span id="toastMsg">Action completed successfully.</span>
+    <span id="toastMsg" class="truncate">Action completed successfully.</span>
   </div>
 
-  <!-- FOOTER -->
   <footer class="bg-white border-t border-slate-200 py-4 px-4 text-center text-xs text-slate-400">
-    <p>© SASPO — Southern African Show Poultry Organisation. Official Directory & Qualification System.</p>
+    <p>© SASPO — Southern African Show Poultry Organisation. Directory & Qualification System.</p>
   </footer>
 
   <script>
@@ -462,18 +472,18 @@
 
       [dirBtn, evalBtn].forEach(btn => {
         if (btn) {
-          btn.className = "px-5 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
+          btn.className = "touch-target px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:bg-slate-100 shrink-0";
         }
       });
 
       document.getElementById(tabId).classList.remove("hidden");
 
       if (tabId === 'directoryTab') {
-        dirBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 bg-saspo-green text-white shadow-sm";
+        dirBtn.className = "touch-target px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-saspo-green text-white shadow-xs shrink-0";
         populateDirectoryDropdowns();
         renderDirectory();
       } else if (tabId === 'evaluatorTab') {
-        evalBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 bg-saspo-green text-white shadow-sm";
+        evalBtn.className = "touch-target px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-saspo-green text-white shadow-xs shrink-0";
       }
     }
 
@@ -505,10 +515,10 @@
         accordion.className = "border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs";
         
         const header = document.createElement("div");
-        header.className = "p-3 bg-slate-50 hover:bg-slate-100 cursor-pointer font-bold text-xs sm:text-sm text-slate-700 flex justify-between items-center transition-all select-none border-l-4 border-saspo-green";
+        header.className = "touch-target p-3 bg-slate-50 hover:bg-slate-100 active:bg-slate-200 cursor-pointer font-bold text-xs sm:text-sm text-slate-700 flex justify-between items-center transition-all select-none border-l-4 border-saspo-green";
         header.innerHTML = `
-          <span>${cat.name} (${cat.breeds.length} breeds)</span>
-          <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-slate-200 text-slate-600" id="badge-${cat.id}">0 / ${cat.reqCount}</span>
+          <span class="pr-2">${cat.name} (${cat.breeds.length} breeds)</span>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-extrabold bg-slate-200 text-slate-600 shrink-0" id="badge-${cat.id}">0 / ${cat.reqCount}</span>
         `;
         header.onclick = () => {
           const body = accordion.querySelector(".acc-body");
@@ -520,9 +530,9 @@
 
         cat.breeds.forEach((breed) => {
           const label = document.createElement("label");
-          label.className = "flex items-center gap-2 text-xs text-slate-700 cursor-pointer hover:text-saspo-dark p-1 rounded-md hover:bg-slate-50";
+          label.className = "flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer hover:text-saspo-dark p-2 rounded-md hover:bg-slate-50 touch-target";
           label.innerHTML = `
-            <input type="checkbox" data-cat="${cat.id}" value="${breed}" onchange="calculateResults()" class="rounded border-slate-300 text-saspo-green focus:ring-saspo-green">
+            <input type="checkbox" data-cat="${cat.id}" value="${breed}" onchange="calculateResults()" class="w-4 h-4 rounded border-slate-300 text-saspo-green focus:ring-saspo-green">
             <span>${breed}</span>
           `;
           body.appendChild(label);
@@ -552,13 +562,13 @@
         const badge = document.getElementById(`badge-${cat.id}`);
         if (badge) {
           if (isQualified) {
-            badge.className = "px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300";
+            badge.className = "px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0";
             badge.textContent = `${passedCount} (Qualified)`;
           } else if (passedCount > 0) {
-            badge.className = "px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200";
+            badge.className = "px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200 shrink-0";
             badge.textContent = `${passedCount} / ${cat.reqCount}`;
           } else {
-            badge.className = "px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-slate-200 text-slate-600";
+            badge.className = "px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-extrabold bg-slate-200 text-slate-600 shrink-0";
             badge.textContent = `0 / ${cat.reqCount}`;
           }
         }
@@ -812,33 +822,33 @@
         if (j.isCategoryJudge) {
           catCount++;
           const isPanelA = j.panel === 'Panel A';
-          card.className = `bg-white rounded-2xl border p-5 shadow-2xs flex flex-col justify-between border-l-4 ${isPanelA ? 'border-l-saspo-gold border-slate-200' : 'border-l-saspo-green border-slate-200'}`;
+          card.className = `bg-white rounded-2xl border p-4 sm:p-5 shadow-2xs flex flex-col justify-between border-l-4 ${isPanelA ? 'border-l-saspo-gold border-slate-200' : 'border-l-saspo-green border-slate-200'}`;
           card.innerHTML = `
             <div>
               <div class="flex justify-between items-start gap-2 mb-2">
                 <div>
-                  <h3 class="font-bold text-slate-800 text-base">${j.name}</h3>
-                  <p class="text-xs text-slate-500">${j.club || 'SASPO Affiliated'}</p>
+                  <h3 class="font-bold text-slate-800 text-sm sm:text-base">${j.name}</h3>
+                  <p class="text-[11px] sm:text-xs text-slate-500">${j.club || 'SASPO Affiliated'}</p>
                 </div>
-                <span class="px-2.5 py-1 rounded-full text-xs font-extrabold uppercase ${isPanelA ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'}">
+                <span class="px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-extrabold uppercase ${isPanelA ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'}">
                   ${j.panel}
                 </span>
               </div>
               <div class="text-xs text-slate-500 mb-3 pb-2 border-b border-dashed border-slate-200">
                 <i class="fa-solid fa-phone mr-1"></i> ${j.phone || 'N/A'}
               </div>
-              <div class="text-xs font-bold text-saspo-dark mb-1">QUALIFIED CATEGORIES:</div>
+              <div class="text-[11px] sm:text-xs font-bold text-saspo-dark mb-1">QUALIFIED CATEGORIES:</div>
               <div class="flex flex-wrap gap-1.5 mt-2">
-                ${j.qualifiedCategories.map(cat => `<span class="px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-check text-xs"></i> ${cat}</span>`).join('')}
+                ${j.qualifiedCategories.map(cat => `<span class="px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-check text-[10px]"></i> ${cat}</span>`).join('')}
               </div>
             </div>
 
             ${isAdmin ? `
-            <div class="flex gap-2 mt-4 pt-3 border-t border-slate-100 justify-end">
-              <button onclick="editJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all">
+            <div class="flex flex-wrap gap-2 mt-4 pt-3 border-t border-slate-100 justify-end">
+              <button onclick="editJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="touch-target px-3 py-1.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
                 <i class="fa-solid fa-pen-to-square"></i> Edit / Add Breeds
               </button>
-              <button onclick="deleteJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition-all border border-rose-200">
+              <button onclick="deleteJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="touch-target px-3 py-1.5 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-700 rounded-lg text-xs font-bold transition-all border border-rose-200 flex items-center gap-1.5">
                 <i class="fa-solid fa-trash"></i> Delete
               </button>
             </div>` : ''}
@@ -846,35 +856,35 @@
           catGrid.appendChild(card);
         } else {
           examCount++;
-          card.className = "bg-white rounded-2xl border border-slate-200 border-l-4 border-l-slate-400 p-5 shadow-2xs flex flex-col justify-between";
+          card.className = "bg-white rounded-2xl border border-slate-200 border-l-4 border-l-slate-400 p-4 sm:p-5 shadow-2xs flex flex-col justify-between";
           card.innerHTML = `
             <div>
               <div class="flex justify-between items-start gap-2 mb-2">
                 <div>
-                  <h3 class="font-bold text-slate-800 text-base">${j.name}</h3>
-                  <p class="text-xs text-slate-500">${j.club || 'SASPO Affiliated'}</p>
+                  <h3 class="font-bold text-slate-800 text-sm sm:text-base">${j.name}</h3>
+                  <p class="text-[11px] sm:text-xs text-slate-500">${j.club || 'SASPO Affiliated'}</p>
                 </div>
-                <span class="px-2.5 py-1 rounded-full text-xs font-extrabold uppercase bg-slate-100 text-slate-600 border border-slate-200">
+                <span class="px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-extrabold uppercase bg-slate-100 text-slate-600 border border-slate-200">
                   ${j.panel}
                 </span>
               </div>
               <div class="text-xs text-slate-500 mb-3 pb-2 border-b border-dashed border-slate-200">
                 <i class="fa-solid fa-phone mr-1"></i> ${j.phone || 'N/A'}
               </div>
-              <div class="text-xs font-bold text-slate-500 mb-1">PASSED BREED EXAMS:</div>
+              <div class="text-[11px] sm:text-xs font-bold text-slate-500 mb-1">PASSED BREED EXAMS:</div>
               <div class="flex flex-wrap gap-1.5 mt-2">
                 ${j.passedExams.length > 0 
-                  ? j.passedExams.map(ex => `<span class="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"><i class="fa-solid fa-clipboard-check text-slate-400"></i> ${ex}</span>`).join('')
+                  ? j.passedExams.map(ex => `<span class="px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"><i class="fa-solid fa-clipboard-check text-slate-400"></i> ${ex}</span>`).join('')
                   : '<span class="text-xs text-slate-400">No breed exams recorded.</span>'}
               </div>
             </div>
 
             ${isAdmin ? `
-            <div class="flex gap-2 mt-4 pt-3 border-t border-slate-100 justify-end">
-              <button onclick="editJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all">
+            <div class="flex flex-wrap gap-2 mt-4 pt-3 border-t border-slate-100 justify-end">
+              <button onclick="editJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="touch-target px-3 py-1.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
                 <i class="fa-solid fa-pen-to-square"></i> Edit / Add Breeds
               </button>
-              <button onclick="deleteJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition-all border border-rose-200">
+              <button onclick="deleteJudgeByButton('${j.name.replace(/'/g, "\\'")}')" class="touch-target px-3 py-1.5 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-700 rounded-lg text-xs font-bold transition-all border border-rose-200 flex items-center gap-1.5">
                 <i class="fa-solid fa-trash"></i> Delete
               </button>
             </div>` : ''}
@@ -888,14 +898,14 @@
 
       if (catCount === 0) {
         catGrid.innerHTML = `
-          <div class="col-span-full p-8 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm">
+          <div class="col-span-full p-6 sm:p-8 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs sm:text-sm">
             <i class="fa-solid fa-folder-open text-2xl mb-2 text-slate-300"></i><br>
             No qualified category judges found in directory.
           </div>`;
       }
       if (examCount === 0) {
         examGrid.innerHTML = `
-          <div class="col-span-full p-8 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm">
+          <div class="col-span-full p-6 sm:p-8 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs sm:text-sm">
             <i class="fa-solid fa-user-graduate text-2xl mb-2 text-slate-300"></i><br>
             No exam candidates found in directory.
           </div>`;
