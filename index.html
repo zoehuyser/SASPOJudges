@@ -369,17 +369,17 @@
         <p class="text-xs text-slate-500 mt-1">Enter administrative passcode to unlock editing features across all devices.</p>
       </div>
 
-      <div class="space-y-3">
-        <div>
-          <input type="password" id="adminPasscode" placeholder="Enter passcode" class="touch-target w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green text-center tracking-widest font-mono">
-        </div>
-        
-        <div class="flex gap-2">
-          <button onclick="closeAuthModal()" class="touch-target flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
-            Cancel
+      <!-- Navigation Tabs -->
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mb-4 sm:mb-6">
+        <div class="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto no-scrollbar">
+          <button id="tabBtnDir" onclick="switchTab('directoryTab')" class="touch-target px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-saspo-green text-white shadow-xs shrink-0">
+            <i class="fa-solid fa-address-book"></i>
+            Judges Directory
           </button>
-          <button onclick="verifyPasscode()" class="touch-target flex-1 py-2.5 bg-saspo-green hover:bg-saspo-dark text-white text-xs font-bold rounded-xl transition-all shadow-xs">
-            Unlock Admin
+
+          <button id="tabBtnEval" onclick="switchTab('evaluatorTab')" class="admin-only hidden touch-target px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:bg-slate-100 shrink-0">
+            <i class="fa-solid fa-calculator"></i>
+            Candidate Evaluator & Qualifier
           </button>
         </div>
       </div>
@@ -621,6 +621,12 @@
       const adminOnlyEls = document.querySelectorAll(".admin-only");
       const guestOnlyEls = document.querySelectorAll(".guest-only");
 
+      // Candidate evaluator form controls to lock/unlock
+      const judgeName = document.getElementById("judgeName");
+      const judgeClub = document.getElementById("judgeClub");
+      const judgePhone = document.getElementById("judgePhone");
+      const evalCheckboxes = document.querySelectorAll("#categoryContainer input[type='checkbox']");
+
       if (isAdmin) {
         guestBadge.classList.add("hidden");
         adminBadge.classList.remove("hidden");
@@ -629,6 +635,13 @@
 
         adminOnlyEls.forEach(el => el.classList.remove("hidden"));
         guestOnlyEls.forEach(el => el.classList.add("hidden"));
+
+        // Enable inputs
+        if (judgeName) { judgeName.disabled = false; judgeName.readOnly = false; }
+        if (judgeClub) { judgeClub.disabled = false; }
+        if (judgePhone) { judgePhone.disabled = false; judgePhone.readOnly = false; }
+        evalCheckboxes.forEach(cb => cb.disabled = false);
+
       } else {
         guestBadge.classList.remove("hidden");
         guestBadge.classList.add("flex");
@@ -638,11 +651,19 @@
         adminOnlyEls.forEach(el => el.classList.add("hidden"));
         guestOnlyEls.forEach(el => el.classList.remove("hidden"));
 
-        // If currently on evaluator tab in guest mode, fallback to directory
-        const evalTab = document.getElementById("evaluatorTab");
-        if (evalTab && !evalTab.classList.contains("hidden")) {
-          switchTab('directoryTab');
-        }
+        // Disable inputs strictly
+        if (judgeName) { judgeName.disabled = true; judgeName.readOnly = true; }
+        if (judgeClub) { judgeClub.disabled = true; }
+        if (judgePhone) { judgePhone.disabled = true; judgePhone.readOnly = true; }
+        evalCheckboxes.forEach(cb => cb.disabled = true);
+
+        // Reset editing state if locked
+        editingJudgeName = null;
+        const editingTag = document.getElementById("editingTag");
+        if (editingTag) editingTag.classList.add("hidden");
+
+        // Force user to Directory Tab when locking Admin
+        switchTab('directoryTab');
       }
 
       renderDirectory();
@@ -677,6 +698,11 @@
     }
 
     function switchTab(tabId) {
+      if (tabId === 'evaluatorTab' && !isAdmin) {
+        showToast("Candidate Evaluator requires Admin permissions.", true);
+        tabId = 'directoryTab';
+      }
+
       document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
       
       const dirBtn = document.getElementById("tabBtnDir");
@@ -688,13 +714,14 @@
         }
       });
 
-      document.getElementById(tabId).classList.remove("hidden");
+      const targetTab = document.getElementById(tabId);
+      if (targetTab) targetTab.classList.remove("hidden");
 
-      if (tabId === 'directoryTab') {
+      if (tabId === 'directoryTab' && dirBtn) {
         dirBtn.className = "touch-target px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-saspo-green text-white shadow-xs shrink-0";
         populateDirectoryDropdowns();
         renderDirectory();
-      } else if (tabId === 'evaluatorTab') {
+      } else if (tabId === 'evaluatorTab' && evalBtn) {
         evalBtn.className = "touch-target px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-saspo-green text-white shadow-xs shrink-0";
       }
     }
@@ -745,7 +772,7 @@
           const label = document.createElement("label");
           label.className = "flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer hover:text-saspo-dark p-2 rounded-md hover:bg-slate-50 touch-target";
           label.innerHTML = `
-            <input type="checkbox" data-cat="${cat.id}" value="${breed}" onchange="calculateResults()" class="w-4 h-4 rounded border-slate-300 text-saspo-green focus:ring-saspo-green">
+            <input type="checkbox" data-cat="${cat.id}" value="${breed}" ${!isAdmin ? 'disabled' : ''} onchange="calculateResults()" class="w-4 h-4 rounded border-slate-300 text-saspo-green focus:ring-saspo-green disabled:opacity-50 disabled:cursor-not-allowed">
             <span>${breed}</span>
           `;
           body.appendChild(label);
@@ -880,7 +907,7 @@
 
     async function saveCandidateToDirectory() {
       if (!isAdmin) {
-        showToast("Please unlock Admin Mode to save modifications.", true);
+        showToast("Unauthorized: Please unlock Admin Mode to save modifications.", true);
         return;
       }
 
@@ -915,7 +942,7 @@
 
     function editJudgeByButton(judgeName) {
       if (!isAdmin) {
-        showToast("Please unlock Admin Mode to edit candidates.", true);
+        showToast("Unauthorized: Please unlock Admin Mode to edit candidates.", true);
         return;
       }
 
@@ -945,7 +972,7 @@
 
     async function deleteJudgeByButton(judgeName) {
       if (!isAdmin) {
-        showToast("Please unlock Admin Mode to delete entries.", true);
+        showToast("Unauthorized: Please unlock Admin Mode to delete entries.", true);
         return;
       }
 
