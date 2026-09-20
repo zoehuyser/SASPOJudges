@@ -393,56 +393,9 @@
       { id: "cat_9", name: "Turkeys", reqCount: 3, breeds: ["American Mammoth Bronze", "Beltsville White", "Blue", "Bourbon Red", "British White", "Buff", "Cröllwitzer", "Narragansett", "Norfolk Black", "Royal Palm", "Slate"] }
     ];
 
-    // Historical 2023, 2024, and 2026 Championship Allocations populated from official SASPO lists
-    const defaultAllocations = [
-      // 2023 Allocations
-      { id: 202301, year: 2023, judgeName: "PJD Stofberg", breed: "Ameraucana" },
-      { id: 202302, year: 2023, judgeName: "PJD Stofberg", breed: "Ancona" },
-      { id: 202303, year: 2023, judgeName: "AP Lingenfelder", breed: "Australorp" },
-      { id: 202304, year: 2023, judgeName: "H Swart", breed: "Australorp" },
-      { id: 202305, year: 2023, judgeName: "N Snyman", breed: "Barnevelder" },
-      { id: 202306, year: 2023, judgeName: "T van Greune", breed: "Brahma" },
-      { id: 202307, year: 2023, judgeName: "H Swart", breed: "Leghorn" },
-      { id: 202308, year: 2023, judgeName: "D Labuschagne", breed: "Leghorn" },
-      { id: 202309, year: 2023, judgeName: "M du Plessis", breed: "New Hampshire" },
-      { id: 202310, year: 2023, judgeName: "HB Klopper", breed: "Sussex" },
-      { id: 202311, year: 2023, judgeName: "H Tieleman", breed: "Barbu d'Anvers" },
-      { id: 202312, year: 2023, judgeName: "J Botha", breed: "American Game" },
-      { id: 202313, year: 2023, judgeName: "Tim Nixon", breed: "Aseel (Asil)" },
-      { id: 202314, year: 2023, judgeName: "J. Faure", breed: "Black East Indian" },
-      { id: 202315, year: 2023, judgeName: "J. Losos", breed: "Call Duck" },
+    const defaultDirectory = [];
 
-      // 2024 Allocations
-      { id: 202401, year: 2024, judgeName: "Otto Steinhofel", breed: "Ameraucana" },
-      { id: 202402, year: 2024, judgeName: "Albert Lingenfelder", breed: "Ancona" },
-      { id: 202403, year: 2024, judgeName: "Hennie Swart", breed: "Australorp" },
-      { id: 202404, year: 2024, judgeName: "Martin du Plessis", breed: "Barnevelder" },
-      { id: 202405, year: 2024, judgeName: "Michael Losos", breed: "Brahma" },
-      { id: 202406, year: 2024, judgeName: "Willie Hall", breed: "Brahma" },
-      { id: 202407, year: 2024, judgeName: "APC Van Greune", breed: "Leghorn" },
-      { id: 202408, year: 2024, judgeName: "Martin du Plessis", breed: "New Hampshire" },
-      { id: 202409, year: 2024, judgeName: "F Lambert", breed: "Sussex" },
-      { id: 202410, year: 2024, judgeName: "H Tieleman", breed: "Barbu d'Anvers" },
-      { id: 202411, year: 2024, judgeName: "Sidney Kaber", breed: "American Game" },
-      { id: 202412, year: 2024, judgeName: "John Faure", breed: "Black East Indian" },
-      { id: 202413, year: 2024, judgeName: "Martin Du Plessis", breed: "Call Duck" },
-
-      // 2026 Allocations
-      { id: 202601, year: 2026, judgeName: "Willie Hall", breed: "Ameraucana" },
-      { id: 202602, year: 2026, judgeName: "Clinton du Preez", breed: "Australorp" },
-      { id: 202603, year: 2026, judgeName: "Dieter Labuschagne", breed: "Australorp" },
-      { id: 202604, year: 2026, judgeName: "Michael Losos", breed: "Barnevelder" },
-      { id: 202605, year: 2026, judgeName: "Pieter Stofberg", breed: "Brahma" },
-      { id: 202606, year: 2026, judgeName: "Willie Hall", breed: "Brahma" },
-      { id: 202607, year: 2026, judgeName: "Dawie Snyman", breed: "Leghorn" },
-      { id: 202608, year: 2026, judgeName: "Frank Lambert", breed: "New Hampshire" },
-      { id: 202609, year: 2026, judgeName: "Willie Hall", breed: "Sussex" },
-      { id: 202610, year: 2026, judgeName: "Frank Lambert", breed: "Sussex" },
-      { id: 202611, year: 2026, judgeName: "Hendre Tieleman", breed: "Barbu d'Anvers" },
-      { id: 202612, year: 2026, judgeName: "Sidney Kaber", breed: "American Game" },
-      { id: 202613, year: 2026, judgeName: "John Faure", breed: "Black East Indian" },
-      { id: 202614, year: 2026, judgeName: "Jaco van Wyk", breed: "Indian Runner" }
-    ];
+    const defaultAllocations = [];
 
     function evaluateJudge(passedExams = []) {
       const qualifiedCategories = [];
@@ -922,7 +875,7 @@
       }
       try {
         const parsed = JSON.parse(stored);
-        if (!Array.isArray(parsed) || parsed.length < defaultDirectory.length) {
+        if (!Array.isArray(parsed)) {
           localStorage.setItem("saspo_judges_db_v3", JSON.stringify(defaultDirectory));
           return defaultDirectory;
         }
