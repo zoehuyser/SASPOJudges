@@ -282,7 +282,7 @@
 
               <div class="mt-5 sm:mt-6 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
                 <button onclick="saveCandidateToDirectory()" class="touch-target flex-2 py-3 px-5 bg-saspo-green hover:bg-saspo-dark active:bg-saspo-dark text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-xs flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-cloud-arrow-up"></i> Save Candidate to Cloud
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Save Candidate to Directory
                 </button>
                 <button onclick="resetForm()" class="touch-target flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2">
                   <i class="fa-solid fa-eraser"></i> Clear & New
@@ -366,7 +366,7 @@
           <i class="fa-solid fa-lock"></i>
         </div>
         <h3 class="font-bold text-slate-800 text-base sm:text-lg">Admin Authentication</h3>
-        <p class="text-xs text-slate-500 mt-1">Enter administrative passcode to unlock full editing features across all devices.</p>
+        <p class="text-xs text-slate-500 mt-1">Enter administrative passcode to unlock editing features across all devices.</p>
       </div>
 
       <div class="space-y-3">
@@ -428,9 +428,17 @@
           appId: "1:123456789:web:demo"
         };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    let app, auth, db;
+    let cloudSyncActive = false;
+
+    try {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      cloudSyncActive = true;
+    } catch (e) {
+      console.warn("Firebase initialization warning (falling back to LocalStorage):", e);
+    }
 
     // Global cloud state container
     window.cloudJudges = [];
@@ -438,10 +446,15 @@
     window.appIdVal = appId;
 
     // Strict Firestore Path Enforcement (Rule 1)
-    const judgesCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'judges');
+    const judgesCollectionRef = db ? collection(db, 'artifacts', appId, 'public', 'data', 'judges') : null;
 
     // Initialize Firebase Authentication & Real-Time Firestore Synchronization
     async function initCloudSync() {
+      if (!cloudSyncActive || !judgesCollectionRef) {
+        setOfflineMode("Local Mode");
+        return;
+      }
+
       try {
         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
           await signInWithCustomToken(auth, __initial_auth_token);
@@ -453,7 +466,9 @@
         try {
           await signInAnonymously(auth);
         } catch(e) {
-          console.error("Anonymous auth failed:", e);
+          console.warn("Anonymous auth failed, falling back to local mode:", e);
+          setOfflineMode("Local Mode");
+          return;
         }
       }
 
@@ -474,7 +489,6 @@
             window.cloudJudges = judgesList;
 
             // Update UI status to Active Realtime Sync
-            const syncBadge = document.getElementById("syncBadge");
             const syncIcon = document.getElementById("syncIcon");
             const syncText = document.getElementById("syncText");
 
@@ -493,23 +507,42 @@
             }
           },
           (error) => {
-            console.error("Firestore real-time sync error:", error);
-            const syncIcon = document.getElementById("syncIcon");
-            const syncText = document.getElementById("syncText");
-            if (syncIcon && syncText) {
-              syncIcon.className = "fa-solid fa-cloud-exclamation text-rose-500 animate-none";
-              syncText.textContent = "Sync Offline";
-            }
+            console.warn("Firestore real-time sync error, using local state:", error);
+            setOfflineMode("Sync Offline");
           }
         );
       });
     }
 
+    function setOfflineMode(label) {
+      const syncIcon = document.getElementById("syncIcon");
+      const syncText = document.getElementById("syncText");
+      if (syncIcon && syncText) {
+        syncIcon.className = "fa-solid fa-cloud-slash text-slate-400 animate-none";
+        syncText.textContent = label;
+        syncText.className = "text-slate-500 font-semibold";
+      }
+      // Load fallback local storage if present
+      const saved = localStorage.getItem("saspo_judges_local");
+      if (saved) {
+        try { window.cloudJudges = JSON.parse(saved); } catch(e){}
+      }
+      if (typeof window.populateDirectoryDropdowns === 'function') window.populateDirectoryDropdowns();
+      if (typeof window.renderDirectory === 'function') window.renderDirectory();
+    }
+
     // Cloud helper: Save / Update judge entry in Firestore
     window.saveJudgeToCloud = async function(judgeData) {
-      if (!auth.currentUser) {
-        showToast("Authenticating with cloud...", true);
-        return false;
+      if (!auth || !auth.currentUser || !db) {
+        // Fallback Local Storage
+        let current = [];
+        try { current = JSON.parse(localStorage.getItem("saspo_judges_local")) || []; } catch(e){}
+        const idx = current.findIndex(j => j.name.toLowerCase() === judgeData.name.toLowerCase());
+        if (idx >= 0) current[idx] = judgeData;
+        else current.push(judgeData);
+        localStorage.setItem("saspo_judges_local", JSON.stringify(current));
+        window.cloudJudges = current;
+        return true;
       }
 
       try {
@@ -535,7 +568,15 @@
 
     // Cloud helper: Delete judge entry from Firestore
     window.deleteJudgeFromCloud = async function(judgeName) {
-      if (!auth.currentUser) return false;
+      if (!auth || !auth.currentUser || !db) {
+        let current = [];
+        try { current = JSON.parse(localStorage.getItem("saspo_judges_local")) || []; } catch(e){}
+        current = current.filter(j => j.name.toLowerCase() !== judgeName.toLowerCase());
+        localStorage.setItem("saspo_judges_local", JSON.stringify(current));
+        window.cloudJudges = current;
+        if (typeof window.renderDirectory === 'function') window.renderDirectory();
+        return true;
+      }
 
       try {
         const docId = judgeName.toLowerCase().replace(/[^a-z0-9]/g, '_');
@@ -599,7 +640,7 @@
 
         // If currently on evaluator tab in guest mode, fallback to directory
         const evalTab = document.getElementById("evaluatorTab");
-        if (!evalTab.classList.contains("hidden")) {
+        if (evalTab && !evalTab.classList.contains("hidden")) {
           switchTab('directoryTab');
         }
       }
@@ -628,7 +669,7 @@
       if (code === "saspo123") {
         isAdmin = true;
         closeAuthModal();
-        showToast("Admin access granted! Full editing active.");
+        showToast("Admin access granted! Editing enabled.");
         updateUIVisibility();
       } else {
         showToast("Incorrect passcode", true);
@@ -679,6 +720,7 @@
 
     function renderCategories() {
       const container = document.getElementById("categoryContainer");
+      if (!container) return;
       container.innerHTML = "";
 
       saspoData.forEach((cat) => {
@@ -716,8 +758,9 @@
     }
 
     function calculateResults() {
-      const nameInput = document.getElementById("judgeName").value.trim() || "Candidate Name";
-      document.getElementById("displayName").textContent = nameInput;
+      const nameInput = document.getElementById("judgeName") ? document.getElementById("judgeName").value.trim() || "Candidate Name" : "Candidate Name";
+      const nameElem = document.getElementById("displayName");
+      if (nameElem) nameElem.textContent = nameInput;
 
       let totalExams = 0;
       const categoryResults = [];
@@ -757,8 +800,10 @@
       const evaluated = evaluateJudge(currentPassedExams);
       const qualCategoriesCount = evaluated.qualifiedCategories.length;
 
-      document.getElementById("qualCatCount").textContent = `${qualCategoriesCount} / 9`;
-      document.getElementById("totalExamsCount").textContent = totalExams;
+      const qCountElem = document.getElementById("qualCatCount");
+      const tExamsElem = document.getElementById("totalExamsCount");
+      if (qCountElem) qCountElem.textContent = `${qualCategoriesCount} / 9`;
+      if (tExamsElem) tExamsElem.textContent = totalExams;
 
       let overallPanel = evaluated.panel;
       let subtitle = "Entry Level Candidate";
@@ -768,12 +813,16 @@
       else if (overallPanel === "Panel C") subtitle = "Qualified in 3+ Categories";
       else if (overallPanel === "Panel D") subtitle = "Qualified Category Judge";
 
-      document.getElementById("overallPanel").textContent = overallPanel;
-      document.getElementById("panelSubtitle").textContent = subtitle;
+      const panelElem = document.getElementById("overallPanel");
+      const subElem = document.getElementById("panelSubtitle");
+      if (panelElem) panelElem.textContent = overallPanel;
+      if (subElem) subElem.textContent = subtitle;
 
       const progress = Math.min(100, Math.round((qualCategoriesCount / 9) * 100));
-      document.getElementById("progressBar").style.width = `${progress}%`;
-      document.getElementById("progressPercent").textContent = `${progress}%`;
+      const pBar = document.getElementById("progressBar");
+      const pPerc = document.getElementById("progressPercent");
+      if (pBar) pBar.style.width = `${progress}%`;
+      if (pPerc) pPerc.textContent = `${progress}%`;
 
       renderRoadmap(qualCategoriesCount);
       renderBreakdown(categoryResults);
@@ -781,6 +830,7 @@
 
     function renderRoadmap(qualCount) {
       const roadmap = document.getElementById("roadmapContent");
+      if (!roadmap) return;
       let html = "";
       if (qualCount < 1) html += `<p>• Pass exams to qualify 1 whole category to unlock Panel D.</p>`;
       if (qualCount < 3) html += `<p>• Pass ${3 - qualCount} more category/categories for Panel C status.</p>`;
@@ -794,6 +844,7 @@
 
     function renderBreakdown(results) {
       const container = document.getElementById("categoryBreakdown");
+      if (!container) return;
       container.innerHTML = "";
       results.forEach(res => {
         const div = document.createElement("div");
@@ -848,12 +899,12 @@
 
       const newCandidate = { name, club, phone, passedExams };
 
-      // Persistent Firestore Save
+      // Persistent Cloud/Local Save
       if (typeof window.saveJudgeToCloud === 'function') {
-        showToast(`Saving ${name} to Cloud database...`);
+        showToast(`Saving ${name} to database...`);
         const success = await window.saveJudgeToCloud(newCandidate);
         if (success) {
-          showToast(`Successfully saved ${name} across all devices!`);
+          showToast(`Successfully saved ${name}!`);
           editingJudgeName = null;
           document.getElementById("editingTag").classList.add("hidden");
           resetForm();
@@ -899,10 +950,10 @@
       }
 
       if (typeof window.deleteJudgeFromCloud === 'function') {
-        showToast(`Deleting ${judgeName} from Cloud...`);
+        showToast(`Deleting ${judgeName}...`);
         const success = await window.deleteJudgeFromCloud(judgeName);
         if (success) {
-          showToast(`${judgeName} deleted across all devices.`);
+          showToast(`${judgeName} deleted.`);
         }
       }
     }
@@ -976,7 +1027,7 @@
           (j.club && j.club.toLowerCase().includes(searchTerm)) ||
           (j.phone && j.phone.toLowerCase().includes(searchTerm)) ||
           j.qualifiedCategories.some(c => c.toLowerCase().includes(searchTerm)) ||
-          j.passedExams.some(e => e.toLowerCase().includes(searchTerm));
+          (j.passedExams && j.passedExams.some(e => e.toLowerCase().includes(searchTerm)));
 
         const matchesClub = !selectedClub || j.club === selectedClub;
         const matchesCategory = !selectedCategory || j.qualifiedCategories.includes(selectedCategory);
@@ -1040,7 +1091,7 @@
               </div>
               <div class="text-[11px] sm:text-xs font-bold text-slate-500 mb-1">PASSED BREED EXAMS:</div>
               <div class="flex flex-wrap gap-1.5 mt-2">
-                ${j.passedExams.length > 0 
+                ${j.passedExams && j.passedExams.length > 0 
                   ? j.passedExams.map(ex => `<span class="px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"><i class="fa-solid fa-clipboard-check text-slate-400"></i> ${ex}</span>`).join('')
                   : '<span class="text-xs text-slate-400">No breed exams recorded.</span>'}
               </div>
@@ -1095,6 +1146,8 @@
       const t = document.getElementById("toast");
       const tMsg = document.getElementById("toastMsg");
       const tIcon = document.getElementById("toastIcon");
+
+      if (!t || !tMsg || !tIcon) return;
 
       tMsg.textContent = msg;
       if (isError) {
