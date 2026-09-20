@@ -4,11 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>SASPO Judges Management Portal</title>
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- Tailwind Custom Theme Configuration -->
   <script>
     tailwind.config = {
       theme: {
@@ -28,6 +30,7 @@
     }
   </script>
 
+  <!-- Custom CSS and Scrollbar Styling -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     body {
@@ -66,10 +69,11 @@
 <body class="min-h-screen text-slate-800 flex flex-col justify-between pt-safe pb-safe pl-safe pr-safe">
 
   <div>
-    <header class="bg-white border-b-4 border-saspo-green shadow-sm px-3 sm:px-6 lg:px-8 py-3 sm:py-4 mb-4 sm:mb-6">
+    <!-- Header Section -->
+    <header class="bg-white border-b-4 border-saspo-green shadow-xs px-3 sm:px-6 lg:px-8 py-3 sm:py-4 mb-4 sm:mb-6">
       <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
         
-        <!-- Brand identity -->
+        <!-- SASPO Brand Header -->
         <div class="flex items-center gap-3 sm:gap-4 text-center md:text-left w-full md:w-auto justify-center md:justify-start">
           <div class="w-12 h-12 sm:w-16 sm:h-16 bg-saspo-green rounded-xl flex items-center justify-center text-white shadow-inner font-extrabold text-xl sm:text-2xl border-2 border-saspo-gold shrink-0">
             SASPO
@@ -80,9 +84,16 @@
           </div>
         </div>
 
-        <!-- Admin / Guest Mode Switch Controls -->
+        <!-- Mode Switcher Controls & Real-Time Sync Indicator -->
         <div class="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 bg-slate-100 p-1.5 sm:p-2 rounded-2xl border border-slate-200 w-full md:w-auto overflow-x-auto">
-          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 pl-1.5 shrink-0">
+          
+          <!-- Cloud Sync Badge Status -->
+          <div id="syncBadge" class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-500 shrink-0">
+            <i id="syncIcon" class="fa-solid fa-cloud text-amber-500 animate-pulse"></i>
+            <span id="syncText">Connecting...</span>
+          </div>
+
+          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 pl-1 border-l border-slate-300 shrink-0">
             Mode:
           </span>
 
@@ -103,6 +114,7 @@
       </div>
     </header>
 
+    <!-- Navigation Tabs -->
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mb-4 sm:mb-6">
       <div class="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto no-scrollbar">
         <button id="tabBtnDir" onclick="switchTab('directoryTab')" class="touch-target px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-saspo-green text-white shadow-xs shrink-0">
@@ -117,9 +129,10 @@
       </div>
     </div>
 
+    <!-- Main Application Container -->
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mb-8 sm:mb-12">
 
-      <!-- DIRECTORY TAB -->
+      <!-- TAB 1: DIRECTORY TAB -->
       <div id="directoryTab" class="tab-content block">
         
         <!-- Search and Filters Bar -->
@@ -205,6 +218,7 @@
 
       </div>
 
+      <!-- TAB 2: CANDIDATE EVALUATOR TAB (ADMIN ONLY) -->
       <div id="evaluatorTab" class="tab-content hidden">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8">
           
@@ -268,7 +282,7 @@
 
               <div class="mt-5 sm:mt-6 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
                 <button onclick="saveCandidateToDirectory()" class="touch-target flex-2 py-3 px-5 bg-saspo-green hover:bg-saspo-dark active:bg-saspo-dark text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-xs flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-user-check"></i> Save Candidate to Directory
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Save Candidate to Cloud
                 </button>
                 <button onclick="resetForm()" class="touch-target flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2">
                   <i class="fa-solid fa-eraser"></i> Clear & New
@@ -344,6 +358,7 @@
     </main>
   </div>
 
+  <!-- Admin Authentication Modal -->
   <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl max-w-sm w-[92vw] sm:w-full p-5 sm:p-6 shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto">
       <div class="text-center mb-4">
@@ -351,12 +366,12 @@
           <i class="fa-solid fa-lock"></i>
         </div>
         <h3 class="font-bold text-slate-800 text-base sm:text-lg">Admin Authentication</h3>
-        <p class="text-xs text-slate-500 mt-1">Enter administrative passcode to unlock full editing features.</p>
+        <p class="text-xs text-slate-500 mt-1">Enter administrative passcode to unlock full editing features across all devices.</p>
       </div>
 
       <div class="space-y-3">
         <div>
-          <input type="password" id="adminPasscode" placeholder="Enter administrative passcode" class="touch-target w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green text-center tracking-widest font-mono">
+          <input type="password" id="adminPasscode" placeholder="Enter passcode" class="touch-target w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green text-center tracking-widest font-mono">
         </div>
         
         <div class="flex gap-2">
@@ -371,15 +386,174 @@
     </div>
   </div>
 
+  <!-- Global Toast Notification -->
   <div id="toast" class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 max-w-[90vw] bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-lg z-50 hidden flex items-center gap-2 border border-slate-700">
     <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
     <span id="toastMsg" class="truncate">Action completed successfully.</span>
   </div>
 
+  <!-- Footer -->
   <footer class="bg-white border-t border-slate-200 py-4 px-4 text-center text-xs text-slate-400">
-    <p>© SASPO — Southern African Show Poultry Organisation. Directory & Qualification System.</p>
+    <p>© SASPO — Southern African Show Poultry Organisation. Cloud Synchronized Directory.</p>
   </footer>
 
+  <!-- Firebase JS SDK Imports (v11.6.1) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+      getAuth, 
+      signInAnonymously, 
+      signInWithCustomToken, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      doc, 
+      setDoc, 
+      deleteDoc, 
+      onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // App ID & Firebase Config Resolution
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'saspo-judges-app';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : {
+          apiKey: "demo-api-key",
+          authDomain: "demo-app.firebaseapp.com",
+          projectId: "demo-app",
+          storageBucket: "demo-app.appspot.com",
+          messagingSenderId: "123456789",
+          appId: "1:123456789:web:demo"
+        };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Global cloud state container
+    window.cloudJudges = [];
+    window.dbInstance = db;
+    window.appIdVal = appId;
+
+    // Strict Firestore Path Enforcement (Rule 1)
+    const judgesCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'judges');
+
+    // Initialize Firebase Authentication & Real-Time Firestore Synchronization
+    async function initCloudSync() {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (err) {
+        console.warn("Auth initial fallback to anonymous auth:", err);
+        try {
+          await signInAnonymously(auth);
+        } catch(e) {
+          console.error("Anonymous auth failed:", e);
+        }
+      }
+
+      // Guarded Firestore Listener (Rule 3)
+      onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+
+        // Real-time listener across ALL connected devices
+        onSnapshot(
+          judgesCollectionRef,
+          (snapshot) => {
+            const judgesList = [];
+            snapshot.forEach((docSnap) => {
+              const data = docSnap.data();
+              judgesList.push({ id: docSnap.id, ...data });
+            });
+
+            window.cloudJudges = judgesList;
+
+            // Update UI status to Active Realtime Sync
+            const syncBadge = document.getElementById("syncBadge");
+            const syncIcon = document.getElementById("syncIcon");
+            const syncText = document.getElementById("syncText");
+
+            if (syncIcon && syncText) {
+              syncIcon.className = "fa-solid fa-cloud-check text-emerald-500 animate-none";
+              syncText.textContent = "Cloud Sync Active";
+              syncText.className = "text-emerald-700 font-semibold";
+            }
+
+            // Refresh directory and filter options dynamically
+            if (typeof window.populateDirectoryDropdowns === 'function') {
+              window.populateDirectoryDropdowns();
+            }
+            if (typeof window.renderDirectory === 'function') {
+              window.renderDirectory();
+            }
+          },
+          (error) => {
+            console.error("Firestore real-time sync error:", error);
+            const syncIcon = document.getElementById("syncIcon");
+            const syncText = document.getElementById("syncText");
+            if (syncIcon && syncText) {
+              syncIcon.className = "fa-solid fa-cloud-exclamation text-rose-500 animate-none";
+              syncText.textContent = "Sync Offline";
+            }
+          }
+        );
+      });
+    }
+
+    // Cloud helper: Save / Update judge entry in Firestore
+    window.saveJudgeToCloud = async function(judgeData) {
+      if (!auth.currentUser) {
+        showToast("Authenticating with cloud...", true);
+        return false;
+      }
+
+      try {
+        // Document ID derived safely from candidate name
+        const docId = judgeData.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'judges', docId);
+
+        await setDoc(docRef, {
+          name: judgeData.name,
+          club: judgeData.club || "",
+          phone: judgeData.phone || "",
+          passedExams: judgeData.passedExams || [],
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        return true;
+      } catch (error) {
+        console.error("Error saving judge to Firestore:", error);
+        showToast("Error saving data to cloud: " + error.message, true);
+        return false;
+      }
+    };
+
+    // Cloud helper: Delete judge entry from Firestore
+    window.deleteJudgeFromCloud = async function(judgeName) {
+      if (!auth.currentUser) return false;
+
+      try {
+        const docId = judgeName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'judges', docId);
+        await deleteDoc(docRef);
+        return true;
+      } catch (error) {
+        console.error("Error deleting judge from Firestore:", error);
+        showToast("Error deleting candidate from cloud.", true);
+        return false;
+      }
+    };
+
+    // Start sync process on load
+    initCloudSync();
+  </script>
+
+  <!-- Standard Core Application Logic JS -->
   <script>
     // --- SASPO DATA DEFINITION ---
     const saspoData = [
@@ -393,9 +567,6 @@
       { id: "cat_8", name: "Geese", reqCount: 3, breeds: ["American Buff", "Brecon Buff", "Chinese", "Embden", "Pilgrim", "Pomeranian", "Roman", "Sebastopol", "Toulouse"] },
       { id: "cat_9", name: "Turkeys", reqCount: 3, breeds: ["American Mammoth Bronze", "Beltsville White", "Blue", "Bourbon Red", "British White", "Buff", "Cröllwitzer", "Narragansett", "Norfolk Black", "Royal Palm", "Slate"] }
     ];
-
-    // Clean initial state (No pre-populated default judges)
-    const defaultDirectory = [];
 
     // --- STATE MANAGEMENT ---
     let isAdmin = false;
@@ -457,7 +628,7 @@
       if (code === "saspo123") {
         isAdmin = true;
         closeAuthModal();
-        showToast("Admin access granted!");
+        showToast("Admin access granted! Full editing active.");
         updateUIVisibility();
       } else {
         showToast("Incorrect passcode", true);
@@ -649,19 +820,14 @@
     }
 
     function getJudgesData() {
-      const stored = localStorage.getItem("saspo_judges_db_v5");
-      if (!stored) {
-        localStorage.setItem("saspo_judges_db_v5", JSON.stringify(defaultDirectory));
-        return defaultDirectory;
+      // Primary source: Firestore cloudJudges array
+      if (window.cloudJudges && Array.isArray(window.cloudJudges)) {
+        return window.cloudJudges;
       }
-      try {
-        return JSON.parse(stored);
-      } catch(e) {
-        return defaultDirectory;
-      }
+      return [];
     }
 
-    function saveCandidateToDirectory() {
+    async function saveCandidateToDirectory() {
       if (!isAdmin) {
         showToast("Please unlock Admin Mode to save modifications.", true);
         return;
@@ -681,24 +847,19 @@
       });
 
       const newCandidate = { name, club, phone, passedExams };
-      let directory = getJudgesData();
-      
-      // Remove old entry if editing
-      if (editingJudgeName) {
-        directory = directory.filter(j => j.name.toLowerCase() !== editingJudgeName.toLowerCase());
-      } else {
-        directory = directory.filter(j => j.name.toLowerCase() !== name.toLowerCase());
-      }
 
-      directory.push(newCandidate);
-      localStorage.setItem("saspo_judges_db_v5", JSON.stringify(directory));
-      
-      showToast(`${name} saved to directory!`);
-      editingJudgeName = null;
-      document.getElementById("editingTag").classList.add("hidden");
-      
-      resetForm();
-      switchTab('directoryTab');
+      // Persistent Firestore Save
+      if (typeof window.saveJudgeToCloud === 'function') {
+        showToast(`Saving ${name} to Cloud database...`);
+        const success = await window.saveJudgeToCloud(newCandidate);
+        if (success) {
+          showToast(`Successfully saved ${name} across all devices!`);
+          editingJudgeName = null;
+          document.getElementById("editingTag").classList.add("hidden");
+          resetForm();
+          switchTab('directoryTab');
+        }
+      }
     }
 
     function editJudgeByButton(judgeName) {
@@ -731,17 +892,19 @@
       showToast(`Editing ${judge.name}`);
     }
 
-    function deleteJudgeByButton(judgeName) {
+    async function deleteJudgeByButton(judgeName) {
       if (!isAdmin) {
         showToast("Please unlock Admin Mode to delete entries.", true);
         return;
       }
 
-      let directory = getJudgesData();
-      directory = directory.filter(j => j.name.toLowerCase() !== judgeName.toLowerCase());
-      localStorage.setItem("saspo_judges_db_v5", JSON.stringify(directory));
-      renderDirectory();
-      showToast(`${judgeName} deleted.`);
+      if (typeof window.deleteJudgeFromCloud === 'function') {
+        showToast(`Deleting ${judgeName} from Cloud...`);
+        const success = await window.deleteJudgeFromCloud(judgeName);
+        if (success) {
+          showToast(`${judgeName} deleted across all devices.`);
+        }
+      }
     }
 
     function populateDirectoryDropdowns() {
@@ -772,6 +935,8 @@
       }
     }
 
+    window.populateDirectoryDropdowns = populateDirectoryDropdowns;
+
     function filterJudges() {
       renderDirectory();
     }
@@ -789,16 +954,18 @@
       const catGrid = document.getElementById("categoryJudgesGrid");
       const examGrid = document.getElementById("examCandidatesGrid");
 
+      if (!catGrid || !examGrid) return;
+
       catGrid.innerHTML = "";
       examGrid.innerHTML = "";
 
       let catCount = 0;
       let examCount = 0;
 
-      const searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
+      const searchTerm = document.getElementById("searchInput") ? document.getElementById("searchInput").value.toLowerCase().trim() : "";
       const selectedClub = document.getElementById("clubFilter") ? document.getElementById("clubFilter").value : "";
-      const selectedCategory = document.getElementById("categoryFilter").value;
-      const selectedPanel = document.getElementById("panelFilter").value;
+      const selectedCategory = document.getElementById("categoryFilter") ? document.getElementById("categoryFilter").value : "";
+      const selectedPanel = document.getElementById("panelFilter") ? document.getElementById("panelFilter").value : "";
 
       judges.forEach(rawJudge => {
         const evaluation = evaluateJudge(rawJudge.passedExams || []);
@@ -806,7 +973,7 @@
 
         const matchesSearch = !searchTerm || 
           j.name.toLowerCase().includes(searchTerm) ||
-          j.club.toLowerCase().includes(searchTerm) ||
+          (j.club && j.club.toLowerCase().includes(searchTerm)) ||
           (j.phone && j.phone.toLowerCase().includes(searchTerm)) ||
           j.qualifiedCategories.some(c => c.toLowerCase().includes(searchTerm)) ||
           j.passedExams.some(e => e.toLowerCase().includes(searchTerm));
@@ -912,6 +1079,8 @@
       }
     }
 
+    window.renderDirectory = renderDirectory;
+
     function resetForm() {
       document.getElementById("judgeName").value = "";
       document.getElementById("judgeClub").value = "";
@@ -940,13 +1109,18 @@
       }, 3000);
     }
 
+    window.showToast = showToast;
+
     // --- INITIALIZATION ---
     window.onload = function() {
       renderCategories();
       calculateResults();
       updateUIVisibility();
 
-      document.getElementById("judgeName").addEventListener("input", calculateResults);
+      const nameElem = document.getElementById("judgeName");
+      if (nameElem) {
+        nameElem.addEventListener("input", calculateResults);
+      }
     };
   </script>
 </body>
