@@ -122,7 +122,8 @@
           Judges Directory
         </button>
 
-        <button id="tabBtnEval" onclick="switchTab('evaluatorTab')" class="admin-only hidden touch-target px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:bg-slate-100 shrink-0">
+        <!-- STRICT MANDATE: Hidden entirely in Guest Mode via "admin-only hidden" -->
+        <button id="tabBtnEval" onclick="switchTab('evaluatorTab')" class="admin-only hidden touch-target px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all items-center justify-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:bg-slate-100 shrink-0">
           <i class="fa-solid fa-calculator"></i>
           Candidate Evaluator & Qualifier
         </button>
@@ -366,20 +367,21 @@
           <i class="fa-solid fa-lock"></i>
         </div>
         <h3 class="font-bold text-slate-800 text-base sm:text-lg">Admin Authentication</h3>
-        <p class="text-xs text-slate-500 mt-1">Enter administrative passcode to unlock editing features across all devices.</p>
+        <p class="text-xs text-slate-500 mt-1">Enter administrative passcode to unlock Candidate Evaluator and editing capabilities.</p>
       </div>
 
-      <!-- Navigation Tabs -->
-      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mb-4 sm:mb-6">
-        <div class="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto no-scrollbar">
-          <button id="tabBtnDir" onclick="switchTab('directoryTab')" class="touch-target px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-saspo-green text-white shadow-xs shrink-0">
-            <i class="fa-solid fa-address-book"></i>
-            Judges Directory
-          </button>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Passcode</label>
+          <input type="password" id="adminPasscode" placeholder="Enter passcode" onkeydown="if(event.key === 'Enter') verifyPasscode()" class="touch-target w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+        </div>
 
-          <button id="tabBtnEval" onclick="switchTab('evaluatorTab')" class="admin-only hidden touch-target px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:bg-slate-100 shrink-0">
-            <i class="fa-solid fa-calculator"></i>
-            Candidate Evaluator & Qualifier
+        <div class="flex gap-2 pt-2">
+          <button onclick="closeAuthModal()" class="touch-target flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all border border-slate-200">
+            Cancel
+          </button>
+          <button onclick="verifyPasscode()" class="touch-target flex-1 py-2.5 bg-saspo-green hover:bg-saspo-dark active:bg-saspo-dark text-white font-bold text-xs rounded-xl transition-all shadow-xs">
+            Unlock Admin
           </button>
         </div>
       </div>
@@ -445,7 +447,7 @@
     window.dbInstance = db;
     window.appIdVal = appId;
 
-    // Strict Firestore Path Enforcement (Rule 1)
+    // Strict Firestore Path Enforcement
     const judgesCollectionRef = db ? collection(db, 'artifacts', appId, 'public', 'data', 'judges') : null;
 
     // Initialize Firebase Authentication & Real-Time Firestore Synchronization
@@ -472,7 +474,6 @@
         }
       }
 
-      // Guarded Firestore Listener (Rule 3)
       onAuthStateChanged(auth, (user) => {
         if (!user) return;
 
@@ -542,11 +543,11 @@
         else current.push(judgeData);
         localStorage.setItem("saspo_judges_local", JSON.stringify(current));
         window.cloudJudges = current;
+        if (typeof window.renderDirectory === 'function') window.renderDirectory();
         return true;
       }
 
       try {
-        // Document ID derived safely from candidate name
         const docId = judgeData.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'judges', docId);
 
@@ -619,7 +620,6 @@
       const authBtnText = document.getElementById("authBtnText");
       
       const adminOnlyEls = document.querySelectorAll(".admin-only");
-      const guestOnlyEls = document.querySelectorAll(".guest-only");
 
       // Candidate evaluator form controls to lock/unlock
       const judgeName = document.getElementById("judgeName");
@@ -633,13 +633,15 @@
         adminBadge.classList.add("flex");
         authBtnText.textContent = "Lock Admin";
 
-        adminOnlyEls.forEach(el => el.classList.remove("hidden"));
-        guestOnlyEls.forEach(el => el.classList.add("hidden"));
+        // Show Candidate Evaluator tab and all editing features
+        adminOnlyEls.forEach(el => {
+          el.classList.remove("hidden");
+          if (el.tagName === 'BUTTON') el.classList.add("flex");
+        });
 
-        // Enable inputs
         if (judgeName) { judgeName.disabled = false; judgeName.readOnly = false; }
         if (judgeClub) { judgeClub.disabled = false; }
-        if (judgePhone) { judgePhone.disabled = false; judgePhone.readOnly = false; }
+        if (judgePhone) { judgePhone.disabled = false; }
         evalCheckboxes.forEach(cb => cb.disabled = false);
 
       } else {
@@ -648,13 +650,12 @@
         adminBadge.classList.add("hidden");
         authBtnText.textContent = "Unlock Admin";
 
+        // STRICT MANDATE: Completely hide Candidate Evaluator tab & all edit/delete buttons
         adminOnlyEls.forEach(el => el.classList.add("hidden"));
-        guestOnlyEls.forEach(el => el.classList.remove("hidden"));
 
-        // Disable inputs strictly
         if (judgeName) { judgeName.disabled = true; judgeName.readOnly = true; }
         if (judgeClub) { judgeClub.disabled = true; }
-        if (judgePhone) { judgePhone.disabled = true; judgePhone.readOnly = true; }
+        if (judgePhone) { judgePhone.disabled = true; }
         evalCheckboxes.forEach(cb => cb.disabled = true);
 
         // Reset editing state if locked
@@ -662,7 +663,7 @@
         const editingTag = document.getElementById("editingTag");
         if (editingTag) editingTag.classList.add("hidden");
 
-        // Force user to Directory Tab when locking Admin
+        // STRICT MANDATE: Instantly force user view back to Judges Directory in Guest mode
         switchTab('directoryTab');
       }
 
@@ -672,11 +673,12 @@
     function toggleAuthMode() {
       if (isAdmin) {
         isAdmin = false;
-        showToast("Switched to Guest (View-Only) Mode");
+        showToast("Switched to Guest Mode (Evaluator hidden)");
         updateUIVisibility();
       } else {
         document.getElementById("authModal").classList.remove("hidden");
-        document.getElementById("adminPasscode").focus();
+        document.getElementById("adminPasscode").value = "";
+        setTimeout(() => document.getElementById("adminPasscode").focus(), 100);
       }
     }
 
@@ -690,7 +692,7 @@
       if (code === "saspo123") {
         isAdmin = true;
         closeAuthModal();
-        showToast("Admin access granted! Editing enabled.");
+        showToast("Admin access granted! Candidate Evaluator unlocked.");
         updateUIVisibility();
       } else {
         showToast("Incorrect passcode", true);
@@ -698,6 +700,7 @@
     }
 
     function switchTab(tabId) {
+      // Security Guardrail: Prevent Guests from viewing Evaluator tab
       if (tabId === 'evaluatorTab' && !isAdmin) {
         showToast("Candidate Evaluator requires Admin permissions.", true);
         tabId = 'directoryTab';
@@ -708,11 +711,13 @@
       const dirBtn = document.getElementById("tabBtnDir");
       const evalBtn = document.getElementById("tabBtnEval");
 
-      [dirBtn, evalBtn].forEach(btn => {
-        if (btn) {
-          btn.className = "touch-target px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:bg-slate-100 shrink-0";
-        }
-      });
+      if (dirBtn) {
+        dirBtn.className = "touch-target px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:bg-slate-100 shrink-0";
+      }
+      if (evalBtn) {
+        const adminClass = isAdmin ? "flex" : "hidden";
+        evalBtn.className = `${adminClass} admin-only touch-target px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all items-center justify-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:bg-slate-100 shrink-0`;
+      }
 
       const targetTab = document.getElementById(tabId);
       if (targetTab) targetTab.classList.remove("hidden");
@@ -898,7 +903,6 @@
     }
 
     function getJudgesData() {
-      // Primary source: Firestore cloudJudges array
       if (window.cloudJudges && Array.isArray(window.cloudJudges)) {
         return window.cloudJudges;
       }
@@ -907,7 +911,7 @@
 
     async function saveCandidateToDirectory() {
       if (!isAdmin) {
-        showToast("Unauthorized: Please unlock Admin Mode to save modifications.", true);
+        showToast("Unauthorized: Please unlock Admin Mode to save entries.", true);
         return;
       }
 
@@ -926,7 +930,6 @@
 
       const newCandidate = { name, club, phone, passedExams };
 
-      // Persistent Cloud/Local Save
       if (typeof window.saveJudgeToCloud === 'function') {
         showToast(`Saving ${name} to database...`);
         const success = await window.saveJudgeToCloud(newCandidate);
