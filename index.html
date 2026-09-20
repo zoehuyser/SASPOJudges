@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SASPO Judges Portal</title>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --card-bg: #ffffff;
+      --border: #d1dcd5;
+      --text: #1b2e23;
+      --muted: #52665a;
+      --saspo-green: #008738;
+      --saspo-green-dark: #00682a;
+      --saspo-green-light: #e6f4ec;
+      --saspo-gold: #eab308;
+      --saspo-gold-light: #fef9c3;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 24px; max-width: 1300px; margin: 0 auto; }
+
+    header { margin-bottom: 20px; padding: 16px 20px; border-bottom: 3px solid var(--saspo-green); display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: var(--radius); box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+    .header-brand { display: flex; align-items: center; gap: 16px; }
+    .header-brand img { height: 75px; width: auto; object-fit: contain; }
+    header h1 { font-size: 1.8rem; color: var(--saspo-green-dark); margin-bottom: 2px; }
+    header p { color: var(--muted); font-size: 0.95rem; }
+
+    /* TAB NAVIGATION */
+    .nav-tabs { display: flex; gap: 10px; margin-bottom: 24px; justify-content: flex-start; align-items: center; flex-wrap: wrap; }
+    .tab-btn { padding: 12px 24px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); font-size: 1rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+    .tab-btn:hover { background: var(--saspo-green-light); color: var(--saspo-green-dark); }
+    .tab-btn.active { background: var(--saspo-green); color: #fff; border-color: var(--saspo-green-dark); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* EVALUATOR LAYOUT */
+    .grid { display: grid; grid-template-columns: 1fr 400px; gap: 24px; }
+    @media (max-width: 950px) { .grid { grid-template-columns: 1fr; } }
+
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    .card h2 { font-size: 1.15rem; margin-bottom: 14px; color: var(--saspo-green-dark); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--saspo-green-light); padding-bottom: 8px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; color: var(--text); }
+    .form-group input[type="text"], .form-group input[type="number"], .form-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; background-color: #fff; }
+    .form-group input:focus, .form-group select:focus { outline: 2px solid var(--saspo-green); border-color: transparent; }
+
+    .btn { padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 0.9rem; transition: background 0.2s; }
+    .btn-primary { background: var(--saspo-green); color: white; }
+    .btn-primary:hover { background: var(--saspo-green-dark); }
+    .btn-secondary { background: var(--saspo-green-light); color: var(--saspo-green-dark); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #d2ebd9; }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+    .btn-outline-danger { background: #fff; color: var(--danger); border: 1px solid var(--danger); }
+    .btn-outline-danger:hover { background: var(--danger-bg); }
+
+    .category-accordion { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .category-header { background: #f8faf8; padding: 12px 16px; cursor: pointer; font-weight: 600; display: flex; justify-content: space-between; align-items: center; user-select: none; border-left: 4px solid var(--saspo-green); }
+    .category-header:hover { background: var(--saspo-green-light); }
+    .category-body { padding: 14px 16px; display: none; background: #fff; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+    .category-accordion.open .category-body { display: grid; }
+
+    .breed-checkbox { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; cursor: pointer; }
+    .breed-checkbox input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--saspo-green); }
+
+    .badge { padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+    .badge-gray { background: #f1f5f9; color: var(--muted); }
+    .badge-blue { background: var(--saspo-gold-light); color: #854d0e; }
+    .badge-green { background: var(--success-bg); color: var(--success); }
+    .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid #fcd34d; }
+
+    .status-panel { text-align: center; padding: 20px; background: var(--saspo-green-light); border: 2px solid var(--saspo-green); border-radius: var(--radius); margin-bottom: 20px; }
+    .status-panel .panel-title { font-size: 1.8rem; font-weight: 800; color: var(--saspo-green-dark); margin: 6px 0; }
+    .status-panel .person-name { font-size: 1.1rem; font-weight: 600; color: var(--text); }
+
+    .summary-list { list-style: none; font-size: 0.9rem; }
+    .summary-list li { padding: 8px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; }
+    .summary-list li:last-child { border-bottom: none; }
+
+    .progress-bar { height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin-top: 6px; }
+    .progress-fill { height: 100%; background: var(--saspo-gold); width: 0%; transition: width 0.3s ease; }
+    
+    .cat-result { margin-bottom: 10px; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem; }
+    .cat-result.qualified { background: var(--success-bg); border-color: #bbf7d0; }
+    .cat-result.unqualified { background: #fff; }
+
+    /* FILTER & DIRECTORY STYLES */
+    .search-filter-bar { margin-bottom: 24px; background: #fff; padding: 18px; border-radius: var(--radius); border: 1px solid var(--border); display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr auto; gap: 12px; align-items: flex-end; }
+    @media (max-width: 950px) { .search-filter-bar { grid-template-columns: 1fr; } }
+
+    .section-title { font-size: 1.4rem; color: var(--saspo-green-dark); margin: 24px 0 16px 0; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
+    .section-subtitle { font-size: 0.85rem; font-weight: normal; color: var(--muted); }
+
+    .judge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
+
+    .judge-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
+    .judge-card.panel-a { border-left: 6px solid var(--saspo-gold); }
+    .judge-card.panel-cat { border-left: 6px solid var(--saspo-green); }
+    .judge-card.panel-e { border-left: 6px solid #94a3b8; }
+
+    .judge-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .judge-name { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+    .judge-club { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+
+    .panel-badge { padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+    .badge-a { background: var(--saspo-gold-light); color: #854d0e; border: 1px solid #fde047; }
+    .badge-cat { background: var(--saspo-green-light); color: var(--saspo-green-dark); border: 1px solid #bbf7d0; }
+    .badge-e { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+    .contact-info { font-size: 0.85rem; color: var(--muted); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px dashed var(--border); }
+
+    .tag-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .tag { font-size: 0.78rem; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
+    .tag-green { background: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
+    .tag-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+    .card-actions { display: flex; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); justify-content: flex-end; }
+
+    .empty-state { grid-column: 1 / -1; padding: 30px; text-align: center; background: #fff; border-radius: var(--radius); border: 1px dashed var(--border); color: var(--muted); }
+
+    /* ALLOCATIONS STYLES */
+    .allocation-layout { display: grid; grid-template-columns: 450px 1fr; gap: 24px; }
+    @media (max-width: 950px) { .allocation-layout { grid-template-columns: 1fr; } }
+
+    .alert-box { padding: 12px 16px; border-radius: 6px; font-size: 0.88rem; margin-bottom: 16px; display: none; }
+    .alert-warning { background: var(--warning-bg); border: 1px solid #fcd34d; color: #b45309; }
+    .alert-success { background: var(--success-bg); border: 1px solid #bbf7d0; color: #15803d; }
+
+    .table-container { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; background: #fff; }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    th { background: #f8faf8; color: var(--saspo-green-dark); font-weight: 700; }
+    tr:hover { background: #fcfdfc; }
+
+    #toast { visibility: hidden; min-width: 250px; background-color: var(--saspo-green-dark); color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.9rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+    @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+    @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-brand">
+      <img src="SASPO LOGO 2.jpg" alt="SASPO Crest Logo" onerror="this.style.display='none'">
+      <div>
+        <h1>SASPO Judges Management Portal</h1>
+        <p>Southern African Show Poultry Organisation — Evaluator & Directory Engine</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" id="btnTabEval" onclick="switchTab('evaluatorTab', this)">Candidate Evaluator</button>
+    <button class="tab-btn" id="btnTabDir" onclick="switchTab('directoryTab', this)">Judges Directory</button>
+    <button class="tab-btn" id="btnTabAlloc" onclick="switchTab('allocationsTab', this)">National Allocations</button>
+  </div>
+
+  <!-- TAB 1: CANDIDATE EVALUATOR -->
+  <div id="evaluatorTab" class="tab-content active">
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2>Candidate Details</h2>
+          <div class="form-group">
+            <label for="judgeName">Candidate Full Name</label>
+            <input type="text" id="judgeName" placeholder="e.g. Johan Smith">
+          </div>
+          <div class="form-group">
+            <label for="judgeClub">Affiliated Club / Region</label>
+            <select id="judgeClub">
+              <option value="">-- Select Affiliated Club --</option>
+              <option value="Bloemfontein Poultry Club (Freestate)">Bloemfontein Poultry Club (Freestate)</option>
+              <option value="East London Poultry Society (Eastern Cape)">East London Poultry Society (Eastern Cape)</option>
+              <option value="Eastern Cape Poultry Club (Eastern Cape)">Eastern Cape Poultry Club (Eastern Cape)</option>
+              <option value="Mpumalanga Poultry Club (Mpumalanga)">Mpumalanga Poultry Club (Mpumalanga)</option>
+              <option value="Namibia Poultry Club (Namibia)">Namibia Poultry Club (Namibia)</option>
+              <option value="Natal & Coast Poultry Club (Kwazulu-Natal)">Natal & Coast Poultry Club (Kwazulu-Natal)</option>
+              <option value="Orpington Club of South Africa (Nationwide)">Orpington Club of South Africa (Nationwide)</option>
+              <option value="Pretoria Poultry Club (Gauteng)">Pretoria Poultry Club (Gauteng)</option>
+              <option value="Rustenburg Poultry Club (North West)">Rustenburg Poultry Club (North West)</option>
+              <option value="Vryburg Riethaan Poultry Club (North West)">Vryburg Riethaan Poultry Club (North West)</option>
+              <option value="Western Cape Poultry Club (Western Cape)">Western Cape Poultry Club (Western Cape)</option>
+              <option value="Zimbabwe Poultry Club (Zimbabwe)">Zimbabwe Poultry Club (Zimbabwe)</option>
+              <option value="Waterfowl Association of South Africa (Nationwide)">Waterfowl Association of South Africa (Nationwide)</option>
+              <option value="Asian Hard Feather Club (Nationwide)">Asian Hard Feather Club (Nationwide)</option>
+              <option value="Brahma Cochin Club South Africa (Nationwide)">Brahma Cochin Club South Africa (Nationwide)</option>
+              <option value="Southern African Rare Breeds Poultry Association (Nationwide)">Southern African Rare Breeds Poultry Association (Nationwide)</option>
+              <option value="Southern African Silkie Enthusiast Club (Nationwide)">Southern African Silkie Enthusiast Club (Nationwide)</option>
+              <option value="Southern African Soft Feather Serama Club (Nationwide)">Southern African Soft Feather Serama Club (Nationwide)</option>
+              <option value="Southern African Wyandotte Enthusiast's Association (Nationwide)">Southern African Wyandotte Enthusiast's Association (Nationwide)</option>
+              <option value="Other / Non-Affiliated">Other / Non-Affiliated</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="judgePhone">Phone Number</label>
+            <input type="text" id="judgePhone" placeholder="e.g. +27 82 123 4567">
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Select Passed Breed Exams</h2>
+          <div id="categoryContainer"></div>
+          <div style="margin-top: 16px; display: flex; gap: 10px;">
+            <button class="btn btn-primary" style="flex:2;" onclick="saveCandidateToDirectory()">Save Judge to Directory</button>
+            <button class="btn btn-secondary" style="flex:1;" onclick="resetForm()">Clear & New</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="status-panel">
+          <div class="person-name" id="displayName">Candidate Name</div>
+          <div class="panel-title" id="overallPanel">Panel E</div>
+          <div id="panelSubtitle" style="font-size:0.85rem; color:var(--saspo-green-dark); font-weight: 600;">Entry Level Judge</div>
+        </div>
+
+        <div class="card">
+          <h2>Qualification Overview</h2>
+          <ul class="summary-list">
+            <li>
+              <span>Qualified Categories:</span>
+              <strong id="qualCatCount">0 / 9</strong>
+            </li>
+            <li>
+              <span>Total Passed Breed Exams:</span>
+              <strong id="totalExamsCount">0</strong>
+            </li>
+          </ul>
+          <div style="margin-top: 12px;">
+            <div style="font-size: 0.8rem; color: var(--muted); display:flex; justify-content:space-between;">
+              <span>Progression to Panel A</span>
+              <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Roadmap to Next Panels</h2>
+          <div id="roadmapContent" style="font-size: 0.88rem; line-height: 1.5; color: #475569;"></div>
+        </div>
+
+        <div class="card">
+          <h2>Category Breakdown & Remaining</h2>
+          <div id="categoryBreakdown"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: JUDGES DIRECTORY -->
+  <div id="directoryTab" class="tab-content">
+    <div class="search-filter-bar">
+      <div class="form-group" style="margin-bottom:0;">
+        <label for="searchInput">Search Keyword</label>
+        <input type="text" id="searchInput" placeholder="Search judge name, club, or phone..." oninput="filterJudges()">
+      </div>
+
+      <div class="form-group" style="margin-bottom:0;">
+        <label for="clubFilter">Filter Club</label>
+        <select id="clubFilter" onchange="filterJudges()">
+          <option value="">All Affiliated Clubs</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0;">
+        <label for="categoryFilter">Filter Category</label>
+        <select id="categoryFilter" onchange="filterJudges()">
+          <option value="">All Categories</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0;">
+        <label for="panelFilter">Filter Panel</label>
+        <select id="panelFilter" onchange="filterJudges()">
+          <option value="">All Panels</option>
+          <option value="Panel A">Panel A</option>
+          <option value="Panel B">Panel B</option>
+          <option value="Panel C">Panel C</option>
+          <option value="Panel D">Panel D</option>
+          <option value="Panel E">Panel E</option>
+        </select>
+      </div>
+
+      <div>
+        <button class="btn btn-secondary" onclick="clearFilters()" style="height: 42px;">Reset Filters</button>
+      </div>
+    </div>
+
+    <!-- SECTION 1: CATEGORY JUDGES -->
+    <div class="section-title">
+      <span>Category & Panel Judges <span class="section-subtitle">(Qualified Panel A, B, C, or D)</span></span>
+      <span id="catJudgesCount" style="font-size:0.9rem; font-weight:600; color:var(--saspo-green-dark);">0 Judges</span>
+    </div>
+    <div class="judge-grid" id="categoryJudgesGrid"></div>
+
+    <!-- SECTION 2: BREED EXAM CANDIDATES -->
+    <div class="section-title">
+      <span>Breed Exam Candidates <span class="section-subtitle">(Panel E — Specific Passed Exams Only)</span></span>
+      <span id="examJudgesCount" style="font-size:0.9rem; font-weight:600; color:var(--muted);">0 Candidates</span>
+    </div>
+    <div class="judge-grid" id="examCandidatesGrid"></div>
+  </div>
+
+  <!-- TAB 3: NATIONAL CHAMPIONSHIP ALLOCATIONS -->
+  <div id="allocationsTab" class="tab-content">
+    <div class="allocation-layout">
+      <!-- Allocation Form & Rule Checker -->
+      <div>
+        <div class="card">
+          <h2>Allocate Judge & Breeds for Championship</h2>
+          <div class="form-group">
+            <label for="allocYear">Championship Year</label>
+            <input type="number" id="allocYear" value="2026" onchange="checkAllocationRule()">
+          </div>
+          <div class="form-group">
+            <label for="allocJudge">Select Judge</label>
+            <select id="allocJudge" onchange="checkAllocationRule()">
+              <option value="">-- Choose Judge --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Select Breeds Judged (Check all that apply)</label>
+            <div id="allocBreedContainer" style="max-height: 280px; overflow-y: auto; border: 1px solid var(--border); padding: 12px; border-radius: 6px; background: #fff;">
+              <!-- Dynamically populated checkboxes grouped by category -->
+            </div>
+          </div>
+
+          <!-- Alert Box for Consecutive Rule -->
+          <div id="consecutiveAlert" class="alert-box alert-warning">
+            ⚠️ <strong>Consecutive Appointment Warning:</strong> This judge is already recorded as judging one or more selected breeds in the previous year's National Championship.
+          </div>
+          <div id="validAlert" class="alert-box alert-success">
+            ✓ Eligible: No consecutive year conflicts found for selected breeds.
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="saveAllocation()">Confirm & Save Allocations</button>
+        </div>
+      </div>
+
+      <!-- Allocations History & Registry Table -->
+      <div>
+        <div class="card">
+          <h2>National Championship Allocation History</h2>
+          <div style="display:flex; gap: 10px; margin-bottom: 16px;">
+            <input type="text" id="allocSearchInput" placeholder="Filter by year, judge, or breed..." oninput="renderAllocationsTable()" style="padding: 8px 12px; border:1px solid var(--border); border-radius:6px; flex:1;">
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Judge Name</th>
+                  <th>Allocated Breed</th>
+                  <th>Status / Flag</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="allocationsTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast">Candidate Saved!</div>
+
+  <script>
+    const saspoData = [
+      { id: "cat_1", name: "Asian Hard Feather", reqCount: 3, breeds: ["Aseel (Asil)", "Ayam Cemani", "Ayam Serama (Working Standard)", "Kinpa", "Ko-Shamo", "Kulang Aseel", "Madras Aseel", "Malay", "Nankin Shamo", "O Shamo, Chu Shamo & Bantam Shamo", "Ohiki", "Parrot Beak Long Tail Aseel (Project Status)", "Satsumadori", "Taiwan", "Thai", "The Dong Tau (Project Status)", "Tuzo", "Yakido", "Yamato Gunkei & Chibi Shamo"] },
+      { id: "cat_2", name: "Hard Feather", reqCount: 3, breeds: ["American Game", "Belgian Game Brugges Type", "Belgian Game Liege Type", "Carlisle Game", "Cornish Game", "Cubalaya", "Indian Game", "Modern Game", "Natal Game", "Old English Game", "Phoenix & Onagadori", "Rumpless Game", "Spanish Game", "Sumatra Game", "Yokohama"] },
+      { id: "cat_3", name: "Soft Feather Heavy Breeds", reqCount: 3, breeds: ["Australorp", "Barnevelder", "Bielefelder Kennhühn", "Brahma", "Buckeyes", "Catalana", "Chantecler", "Cochin", "Creve Coeur", "Delaware", "Dorking", "Faverolles", "Frizzles", "Holland", "Ixworth", "Java", "Jersey Giant", "La Fleche", "Lamona", "Langshan", "Marans", "Mechelner", "New Hampshire", "Norfolk Grey", "North Holland Blue", "Orloff", "Orpington", "Pita Pinta Asturiana", "Plymouth Rock", "Potchefstroom Koekoek", "Rhode Island", "Sussex", "Transylvanian Naked Neck", "Wyandotte"] },
+      { id: "cat_4", name: "Soft Feather Light Breeds", reqCount: 3, breeds: ["Ameraucana", "Ancona", "Andalusian", "Appenzeller Spitzhauben", "Auracana", "Auracana Rumpless", "Bassette", "Bergische Kräher", "Brakel", "Breda", "Bresse", "Campine", "Danish", "Deutsche Zwerghuhn", "Dominique", "Friesian", "Groninger Meeuw", "Hamburgh", "Herero", "Houdan", "Kraienkoppe", "Lakenvelder", "Legbar", "Leghorn", "Marsh Daisy", "Minorca", "Naked Neck Silkie", "Old English Pheasant Fowl", "Pavlov", "Polish", "Redcap", "Scots Dumpy", "Scots Grey", "Sicilian Buttercup", "Silkie", "Silverdd's Blue", "Spanish White Face", "Sultan", "Sundheimer", "Venda", "Vorwerk", "Welsummer"] },
+      { id: "cat_5", name: "True Bantam", reqCount: 3, breeds: ["American Serama (Working Standard)", "Barbu d'Anvers & de Grubbe", "Barbu de Watermael & de Bosvoorde", "Barbu d'Uccle & d'Everberg", "Dutch Bantam", "Japanese Chabo", "Nankin Bantam", "Pekin Bantam", "Pekin Frizzled Bantam", "Persian Rumpless", "Rosecomb", "Sabelpoot Bantam (Booted Bantam)", "Sebright"] },
+      { id: "cat_6", name: "Ducks", reqCount: 3, breeds: ["Appleyard", "Appleyard Bantam", "Aylesbury", "Black East Indian", "Call Duck", "Campbell", "Cayuga", "Crested", "Gimbsheimer", "Hochbrutflugenten", "Indian Runner", "Magpie", "Mallard", "Muscovy", "Orpington", "Pekin", "Pomeranian", "Rouen", "Rouen Clair", "Saxony", "Swedish", "Welsh Harlequin"] },
+      { id: "cat_7", name: "Eggs", reqCount: 1, breeds: ["Eggs"] },
+      { id: "cat_8", name: "Geese", reqCount: 3, breeds: ["American Buff", "Brecon Buff", "Chinese", "Embden", "Pilgrim", "Pomeranian", "Roman", "Sebastopol", "Toulouse"] },
+      { id: "cat_9", name: "Turkeys", reqCount: 3, breeds: ["American Mammoth Bronze", "Beltsville White", "Blue", "Bourbon Red", "British White", "Buff", "Cröllwitzer", "Narragansett", "Norfolk Black", "Royal Palm", "Slate"] }
+    ];
+
+    const defaultDirectory = [
+      { name: "Clinton Du Preez", club: "Bloemfontein Poultry Club (Freestate)", phone: "083 486 6733", passedExams: ["Old English Game", "Australorp", "Leghorn", "Orpington", "Rhode Island", "Polish", "Silkie"] },
+      { name: "Hans Greeff", club: "Bloemfontein Poultry Club (Freestate)", phone: "082 7880308", passedExams: ["New Hampshire", "Rhode Island", "Sussex"] },
+      { name: "Hugo Joubert", club: "Bloemfontein Poultry Club (Freestate)", phone: "082 5533063", passedExams: ["Brahma", "Cochin", "Wyandotte"] },
+      { name: "Tony Van Greune", club: "Eastern Cape Poultry Club (Eastern Cape)", phone: "083 781 2591", passedExams: ["Sussex", "Australorp", "New Hampshire", "Orpington", "Rosecomb", "Pekin", "Sebright", "Cornish Game", "Indian Game", "Polish", "Silkie"] },
+      { name: "Joachim Losos", club: "Pretoria Poultry Club (Gauteng)", phone: "073 9268893", passedExams: ["Cornish Game", "Indian Game", "Modern Game", "Malay", "Sumatra Game", "Ko-Shamo", "Australorp", "Brahma", "Orpington", "Wyandotte", "Marans", "Campine", "Polish", "Silkie", "Japanese Chabo", "Rosecomb", "Sebright", "Ayam Serama (Working Standard)", "Indian Runner", "Muscovy", "Call Duck", "Chinese", "Roman", "Sebastopol", "Eggs"] },
+      { name: "JGH (Hannes) Du Plessis", club: "Western Cape Poultry Club (Western Cape)", phone: "082 5745916", passedExams: ["Indian Game", "Cornish Game", "Malay", "Faverolles", "Orpington", "Wyandotte", "Campine", "Hamburgh", "Lakenvelder", "Japanese Chabo", "Rosecomb", "Sebright", "Chinese", "Call Duck", "Indian Runner", "Cayuga"] }
+    ];
+
+    // Historical 2023, 2024, and 2026 Championship Allocations populated from official SASPO lists
+    const defaultAllocations = [
+      // 2023 Allocations
+      { id: 202301, year: 2023, judgeName: "PJD Stofberg", breed: "Ameraucana" },
+      { id: 202302, year: 2023, judgeName: "PJD Stofberg", breed: "Ancona" },
+      { id: 202303, year: 2023, judgeName: "AP Lingenfelder", breed: "Australorp" },
+      { id: 202304, year: 2023, judgeName: "H Swart", breed: "Australorp" },
+      { id: 202305, year: 2023, judgeName: "N Snyman", breed: "Barnevelder" },
+      { id: 202306, year: 2023, judgeName: "T van Greune", breed: "Brahma" },
+      { id: 202307, year: 2023, judgeName: "H Swart", breed: "Leghorn" },
+      { id: 202308, year: 2023, judgeName: "D Labuschagne", breed: "Leghorn" },
+      { id: 202309, year: 2023, judgeName: "M du Plessis", breed: "New Hampshire" },
+      { id: 202310, year: 2023, judgeName: "HB Klopper", breed: "Sussex" },
+      { id: 202311, year: 2023, judgeName: "H Tieleman", breed: "Barbu d'Anvers" },
+      { id: 202312, year: 2023, judgeName: "J Botha", breed: "American Game" },
+      { id: 202313, year: 2023, judgeName: "Tim Nixon", breed: "Aseel (Asil)" },
+      { id: 202314, year: 2023, judgeName: "J. Faure", breed: "Black East Indian" },
+      { id: 202315, year: 2023, judgeName: "J. Losos", breed: "Call Duck" },
+
+      // 2024 Allocations
+      { id: 202401, year: 2024, judgeName: "Otto Steinhofel", breed: "Ameraucana" },
+      { id: 202402, year: 2024, judgeName: "Albert Lingenfelder", breed: "Ancona" },
+      { id: 202403, year: 2024, judgeName: "Hennie Swart", breed: "Australorp" },
+      { id: 202404, year: 2024, judgeName: "Martin du Plessis", breed: "Barnevelder" },
+      { id: 202405, year: 2024, judgeName: "Michael Losos", breed: "Brahma" },
+      { id: 202406, year: 2024, judgeName: "Willie Hall", breed: "Brahma" },
+      { id: 202407, year: 2024, judgeName: "APC Van Greune", breed: "Leghorn" },
+      { id: 202408, year: 2024, judgeName: "Martin du Plessis", breed: "New Hampshire" },
+      { id: 202409, year: 2024, judgeName: "F Lambert", breed: "Sussex" },
+      { id: 202410, year: 2024, judgeName: "H Tieleman", breed: "Barbu d'Anvers" },
+      { id: 202411, year: 2024, judgeName: "Sidney Kaber", breed: "American Game" },
+      { id: 202412, year: 2024, judgeName: "John Faure", breed: "Black East Indian" },
+      { id: 202413, year: 2024, judgeName: "Martin Du Plessis", breed: "Call Duck" },
+
+      // 2026 Allocations
+      { id: 202601, year: 2026, judgeName: "Willie Hall", breed: "Ameraucana" },
+      { id: 202602, year: 2026, judgeName: "Clinton du Preez", breed: "Australorp" },
+      { id: 202603, year: 2026, judgeName: "Dieter Labuschagne", breed: "Australorp" },
+      { id: 202604, year: 2026, judgeName: "Michael Losos", breed: "Barnevelder" },
+      { id: 202605, year: 2026, judgeName: "Pieter Stofberg", breed: "Brahma" },
+      { id: 202606, year: 2026, judgeName: "Willie Hall", breed: "Brahma" },
+      { id: 202607, year: 2026, judgeName: "Dawie Snyman", breed: "Leghorn" },
+      { id: 202608, year: 2026, judgeName: "Frank Lambert", breed: "New Hampshire" },
+      { id: 202609, year: 2026, judgeName: "Willie Hall", breed: "Sussex" },
+      { id: 202610, year: 2026, judgeName: "Frank Lambert", breed: "Sussex" },
+      { id: 202611, year: 2026, judgeName: "Hendre Tieleman", breed: "Barbu d'Anvers" },
+      { id: 202612, year: 2026, judgeName: "Sidney Kaber", breed: "American Game" },
+      { id: 202613, year: 2026, judgeName: "John Faure", breed: "Black East Indian" },
+      { id: 202614, year: 2026, judgeName: "Jaco van Wyk", breed: "Indian Runner" }
+    ];
+
+    function evaluateJudge(passedExams = []) {
+      const qualifiedCategories = [];
+      saspoData.forEach(cat => {
+        const passedInCat = passedExams.filter(breed => cat.breeds.includes(breed)).length;
+        if (passedInCat >= cat.reqCount) {
+          qualifiedCategories.push(cat.name);
+        }
+      });
+      const qualCount = qualifiedCategories.length;
+      let panel = "Panel E";
+      if (qualCount === 9) panel = "Panel A";
+      else if (qualCount >= 5) panel = "Panel B";
+      else if (qualCount >= 3) panel = "Panel C";
+      else if (qualCount >= 1) panel = "Panel D";
+      else panel = "Panel E";
+
+      return { qualifiedCategories, panel, isCategoryJudge: qualCount > 0 };
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.className = "show";
+      setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+      btn.classList.add("active");
+      if(tabId === 'directoryTab') {
+        populateDirectoryDropdowns();
+        renderDirectory();
+      } else if (tabId === 'allocationsTab') {
+        populateAllocationDropdowns();
+        renderAllocBreedCheckboxes();
+        renderAllocationsTable();
+      }
+    }
+
+    function renderCategories() {
+      const container = document.getElementById("categoryContainer");
+      container.innerHTML = "";
+
+      saspoData.forEach((cat) => {
+        const accordion = document.createElement("div");
+        accordion.className = "category-accordion";
+        
+        const header = document.createElement("div");
+        header.className = "category-header";
+        header.innerHTML = `
+          <span>${cat.name} (${cat.breeds.length} breeds)</span>
+          <span class="badge badge-gray" id="badge-${cat.id}">0 / ${cat.reqCount}</span>
+        `;
+        header.onclick = () => accordion.classList.toggle("open");
+
+        const body = document.createElement("div");
+        body.className = "category-body";
+
+        cat.breeds.forEach((breed) => {
+          const label = document.createElement("label");
+          label.className = "breed-checkbox";
+          label.innerHTML = `
+            <input type="checkbox" data-cat="${cat.id}" value="${breed}" onchange="calculateResults()">
+            <span>${breed}</span>
+          `;
+          body.appendChild(label);
+        });
+
+        accordion.appendChild(header);
+        accordion.appendChild(body);
+        container.appendChild(accordion);
+      });
+    }
+
+    function populateDirectoryDropdowns() {
+      const clubSelect = document.getElementById("clubFilter");
+      const catSelect = document.getElementById("categoryFilter");
+
+      if (clubSelect && clubSelect.options.length <= 1) {
+        const judges = getJudgesData();
+        const clubs = [...new Set(judges.map(j => j.club).filter(Boolean))].sort();
+        clubs.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = c;
+          clubSelect.appendChild(opt);
+        });
+      }
+
+      if (catSelect && catSelect.options.length <= 1) {
+        saspoData.forEach(cat => {
+          const opt = document.createElement("option");
+          opt.value = cat.name;
+          opt.textContent = cat.name;
+          catSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function populateAllocationDropdowns() {
+      const judgeSelect = document.getElementById("allocJudge");
+      const judges = getJudgesData();
+      judgeSelect.innerHTML = '<option value="">-- Choose Judge --</option>';
+      judges.sort((a,b) => a.name.localeCompare(b.name)).forEach(j => {
+        const opt = document.createElement("option");
+        opt.value = j.name;
+        opt.textContent = `${j.name} (${j.club || 'Affiliated'})`;
+        judgeSelect.appendChild(opt);
+      });
+    }
+
+    function renderAllocBreedCheckboxes() {
+      const container = document.getElementById("allocBreedContainer");
+      if (!container) return;
+      container.innerHTML = "";
+
+      saspoData.forEach(cat => {
+        const groupDiv = document.createElement("div");
+        groupDiv.style.marginBottom = "14px";
+        
+        const title = document.createElement("div");
+        title.style.fontWeight = "600";
+        title.style.fontSize = "0.85rem";
+        title.style.color = "var(--saspo-green-dark)";
+        title.style.padding = "4px 0";
+        title.style.borderBottom = "1px solid var(--saspo-green-light)";
+        title.textContent = `${cat.name} (${cat.breeds.length} breeds)`;
+        groupDiv.appendChild(title);
+
+        const grid = document.createElement("div");
+        grid.style.display = "grid";
+        grid.style.gridTemplateColumns = "repeat(auto-fill, minmax(200px, 1fr))";
+        grid.style.gap = "8px";
+        grid.style.marginTop = "8px";
+
+        cat.breeds.forEach(breed => {
+          const label = document.createElement("label");
+          label.className = "breed-checkbox";
+          label.style.fontSize = "0.83rem";
+          label.innerHTML = `
+            <input type="checkbox" class="alloc-breed-cb" value="${breed}" onchange="checkAllocationRule()">
+            <span>${breed}</span>
+          `;
+          grid.appendChild(label);
+        });
+
+        groupDiv.appendChild(grid);
+        container.appendChild(groupDiv);
+      });
+    }
+
+    function isConsecutiveAllocation(judgeName, breed, year) {
+      if (!judgeName || !breed || !year) return false;
+      const prevYear = parseInt(year) - 1;
+      const allocations = getAllocations();
+      return allocations.some(a => 
+        a.judgeName.toLowerCase() === judgeName.toLowerCase() && 
+        a.breed.toLowerCase() === breed.toLowerCase() && 
+        parseInt(a.year) === prevYear
+      );
+    }
+
+    function checkAllocationRule() {
+      const year = document.getElementById("allocYear").value;
+      const judgeName = document.getElementById("allocJudge").value;
+      const checkboxes = document.querySelectorAll(".alloc-breed-cb:checked");
+
+      const warningBox = document.getElementById("consecutiveAlert");
+      const validBox = document.getElementById("validAlert");
+
+      if (!judgeName || !year || checkboxes.length === 0) {
+        warningBox.style.display = "none";
+        validBox.style.display = "none";
+        return;
+      }
+
+      let consecutiveBreeds = [];
+      checkboxes.forEach(cb => {
+        if (isConsecutiveAllocation(judgeName, cb.value, year)) {
+          consecutiveBreeds.push(cb.value);
+        }
+      });
+
+      if (consecutiveBreeds.length > 0) {
+        warningBox.style.display = "block";
+        warningBox.innerHTML = `⚠️ <strong>Consecutive Appointment Warning:</strong> This judge already judged the following breed(s) in the previous year: <strong>${consecutiveBreeds.join(", ")}</strong>.`;
+        validBox.style.display = "none";
+      } else {
+        warningBox.style.display = "none";
+        validBox.style.display = "block";
+        validBox.innerHTML = `✓ Eligible: No consecutive year conflicts found for selected breeds.`;
+      }
+    }
+
+    function getAllocations() {
+      const stored = localStorage.getItem("saspo_allocations_v2");
+      if (!stored) {
+        localStorage.setItem("saspo_allocations_v2", JSON.stringify(defaultAllocations));
+        return defaultAllocations;
+      }
+      try {
+        return JSON.parse(stored);
+      } catch(e) {
+        return defaultAllocations;
+      }
+    }
+
+    function saveAllocation() {
+      const year = document.getElementById("allocYear").value;
+      const judgeName = document.getElementById("allocJudge").value;
+      const checkboxes = document.querySelectorAll(".alloc-breed-cb:checked");
+
+      if (!year || !judgeName) {
+        alert("Please enter the Championship Year and select a Judge.");
+        return;
+      }
+
+      if (checkboxes.length === 0) {
+        alert("Please check off at least one breed that the judge allocated.");
+        return;
+      }
+
+      const allocations = getAllocations();
+      let addedCount = 0;
+
+      checkboxes.forEach(cb => {
+        const breed = cb.value;
+        const duplicate = allocations.find(a => a.year == year && a.judgeName.toLowerCase() === judgeName.toLowerCase() && a.breed.toLowerCase() === breed.toLowerCase());
+        if (!duplicate) {
+          allocations.push({
+            id: Date.now() + Math.random(),
+            year: parseInt(year),
+            judgeName,
+            breed
+          });
+          addedCount++;
+        }
+      });
+
+      if (addedCount === 0) {
+        alert("All selected breed allocations already exist for this judge in this year.");
+        return;
+      }
+
+      localStorage.setItem("saspo_allocations_v2", JSON.stringify(allocations));
+      
+      showToast(`Successfully saved ${addedCount} breed allocation(s) for ${judgeName}!`);
+      
+      // Reset checkboxes
+      checkboxes.forEach(cb => cb.checked = false);
+      renderAllocationsTable();
+      checkAllocationRule();
+    }
+
+    function deleteAllocation(id) {
+      if (!confirm("Are you sure you want to remove this national allocation?")) return;
+      let allocations = getAllocations();
+      allocations = allocations.filter(a => a.id !== id);
+      localStorage.setItem("saspo_allocations_v2", JSON.stringify(allocations));
+      renderAllocationsTable();
+      showToast("Allocation removed.");
+    }
+
+    function renderAllocationsTable() {
+      const tbody = document.getElementById("allocationsTableBody");
+      const searchTerm = document.getElementById("allocSearchInput").value.toLowerCase().trim();
+      const allocations = getAllocations();
+
+      tbody.innerHTML = "";
+
+      allocations.sort((a, b) => b.year - a.year || a.judgeName.localeCompare(b.judgeName));
+
+      let count = 0;
+      allocations.forEach(a => {
+        const consecutive = isConsecutiveAllocation(a.judgeName, a.breed, a.year);
+        
+        const matchesSearch = !searchTerm || 
+          a.year.toString().includes(searchTerm) ||
+          a.judgeName.toLowerCase().includes(searchTerm) ||
+          a.breed.toLowerCase().includes(searchTerm);
+
+        if (!matchesSearch) return;
+        count++;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${a.year}</strong></td>
+          <td>${a.judgeName}</td>
+          <td>${a.breed}</td>
+          <td>
+            ${consecutive 
+              ? '<span class="badge badge-warning">🔥 2 Consecutive Years</span>' 
+              : '<span class="badge badge-green">✓ Standard Appointment</span>'}
+          </td>
+          <td style="text-align: right;">
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteAllocation(${a.id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (count === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--muted); padding: 24px;">No national allocations found.</td></tr>`;
+      }
+    }
+
+    function calculateResults() {
+      const nameInput = document.getElementById("judgeName").value.trim() || "Candidate Name";
+      document.getElementById("displayName").textContent = nameInput;
+
+      let totalExams = 0;
+      const categoryResults = [];
+      const currentPassedExams = [];
+
+      saspoData.forEach((cat) => {
+        const checkboxes = document.querySelectorAll(`input[data-cat="${cat.id}"]:checked`);
+        checkboxes.forEach(cb => currentPassedExams.push(cb.value));
+        const passedCount = checkboxes.length;
+        totalExams += passedCount;
+
+        const isQualified = passedCount >= cat.reqCount;
+        const badge = document.getElementById(`badge-${cat.id}`);
+        if (badge) {
+          if (isQualified) {
+            badge.className = "badge badge-green";
+            badge.textContent = `${passedCount} (Qualified)`;
+          } else if (passedCount > 0) {
+            badge.className = "badge badge-blue";
+            badge.textContent = `${passedCount} / ${cat.reqCount}`;
+          } else {
+            badge.className = "badge badge-gray";
+            badge.textContent = `0 / ${cat.reqCount}`;
+          }
+        }
+
+        categoryResults.push({
+          name: cat.name,
+          passedCount,
+          reqCount: cat.reqCount,
+          totalBreeds: cat.breeds.length,
+          isQualified,
+          certsNeededToQual: Math.max(0, cat.reqCount - passedCount)
+        });
+      });
+
+      const evaluated = evaluateJudge(currentPassedExams);
+      const qualCategoriesCount = evaluated.qualifiedCategories.length;
+
+      document.getElementById("qualCatCount").textContent = `${qualCategoriesCount} / 9`;
+      document.getElementById("totalExamsCount").textContent = totalExams;
+
+      let overallPanel = evaluated.panel;
+      let subtitle = "Entry Level (Specific breeds only)";
+
+      if (overallPanel === "Panel A") subtitle = "Senior / All-Round Judge (All Categories)";
+      else if (overallPanel === "Panel B") subtitle = "Qualified in 5+ Categories";
+      else if (overallPanel === "Panel C") subtitle = "Qualified in 3+ Categories";
+      else if (overallPanel === "Panel D") subtitle = "Qualified Category Judge (Panel D)";
+      else subtitle = "Entry Level Judge (Panel E)";
+
+      document.getElementById("overallPanel").textContent = overallPanel;
+      document.getElementById("panelSubtitle").textContent = subtitle;
+
+      const progress = Math.min(100, Math.round((qualCategoriesCount / 9) * 100));
+      document.getElementById("progressBar").style.width = `${progress}%`;
+      document.getElementById("progressPercent").textContent = `${progress}%`;
+
+      renderRoadmap(qualCategoriesCount);
+      renderBreakdown(categoryResults);
+    }
+
+    function renderRoadmap(qualCount) {
+      const roadmap = document.getElementById("roadmapContent");
+      let html = "";
+      if (qualCount < 1) html += `<p>• <strong>To reach Panel D:</strong> Pass required exams to qualify 1 whole category (3 certificates).</p>`;
+      if (qualCount < 3) html += `<p>• <strong>To reach Panel C:</strong> Qualify in ${3 - qualCount} more category/categories.</p>`;
+      if (qualCount < 5) html += `<p>• <strong>To reach Panel B:</strong> Qualify in ${5 - qualCount} more category/categories.</p>`;
+      if (qualCount < 9) html += `<p>• <strong>To reach Panel A:</strong> Qualify in all ${9 - qualCount} remaining categories.</p>`;
+      if (qualCount === 9) {
+        html += `<p style="color:var(--success); font-weight:bold;">✓ All 9 Categories Qualified! Promoted to Panel A Senior Judge status.</p>`;
+      }
+      roadmap.innerHTML = html;
+    }
+
+    function renderBreakdown(results) {
+      const container = document.getElementById("categoryBreakdown");
+      container.innerHTML = "";
+      results.forEach(res => {
+        const div = document.createElement("div");
+        div.className = `cat-result ${res.isQualified ? 'qualified' : 'unqualified'}`;
+        if (res.isQualified) {
+          div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; font-weight:600;">
+              <span>${res.name}</span>
+              <span style="color:var(--success);">✓ Qualified</span>
+            </div>
+            <div style="color:var(--muted); margin-top:4px;">Can judge <strong>all ${res.totalBreeds} breeds</strong>. Passed ${res.passedCount} exam(s).</div>
+          `;
+        } else {
+          div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; font-weight:600;">
+              <span>${res.name}</span>
+              <span style="color:var(--warning);">${res.passedCount}/${res.reqCount} Passed</span>
+            </div>
+            <div style="color:var(--muted); margin-top:4px;">Needs <strong>${res.certsNeededToQual} more exam(s)</strong> to unlock category.</div>
+          `;
+        }
+        container.appendChild(div);
+      });
+    }
+
+    function saveCandidateToDirectory() {
+      const name = document.getElementById("judgeName").value.trim();
+      if (!name) {
+        alert("Please enter judge name before saving.");
+        return;
+      }
+      const club = document.getElementById("judgeClub").value;
+      const phone = document.getElementById("judgePhone").value.trim();
+      const passedExams = [];
+      saspoData.forEach(cat => {
+        const checked = document.querySelectorAll(`input[data-cat="${cat.id}"]:checked`);
+        checked.forEach(cb => passedExams.push(cb.value));
+      });
+
+      const newCandidate = { name, club, phone, passedExams };
+      let directory = getJudgesData();
+      directory = directory.filter(j => j.name.toLowerCase() !== name.toLowerCase());
+      directory.push(newCandidate);
+
+      localStorage.setItem("saspo_judges_db_v3", JSON.stringify(directory));
+      showToast(`${name} saved to directory!`);
+    }
+
+    function editJudgeByButton(btn) {
+      const judgeName = btn.getAttribute("data-name");
+      const directory = getJudgesData();
+      const judge = directory.find(j => j.name.toLowerCase() === judgeName.toLowerCase());
+      if (!judge) return;
+
+      document.getElementById("judgeName").value = judge.name;
+      document.getElementById("judgeClub").value = judge.club || "";
+      document.getElementById("judgePhone").value = judge.phone || "";
+
+      document.querySelectorAll('input[type="checkbox"][data-cat]').forEach(cb => cb.checked = false);
+      if (judge.passedExams && judge.passedExams.length > 0) {
+        judge.passedExams.forEach(breed => {
+          const cb = document.querySelector(`input[value="${CSS.escape(breed)}"]`);
+          if (cb) cb.checked = true;
+        });
+      }
+
+      calculateResults();
+      switchTab('evaluatorTab', document.getElementById('btnTabEval'));
+      showToast(`Editing ${judge.name}`);
+    }
+
+    function deleteJudgeByButton(btn) {
+      const judgeName = btn.getAttribute("data-name");
+      if (!confirm(`Are you sure you want to remove ${judgeName} from the Judges Directory?`)) return;
+
+      let directory = getJudgesData();
+      directory = directory.filter(j => j.name.toLowerCase() !== judgeName.toLowerCase());
+      localStorage.setItem("saspo_judges_db_v3", JSON.stringify(directory));
+      renderDirectory();
+      showToast(`${judgeName} deleted.`);
+    }
+
+    function getJudgesData() {
+      const stored = localStorage.getItem("saspo_judges_db_v3");
+      if (!stored) {
+        localStorage.setItem("saspo_judges_db_v3", JSON.stringify(defaultDirectory));
+        return defaultDirectory;
+      }
+      try {
+        const parsed = JSON.parse(stored);
+        if (!Array.isArray(parsed) || parsed.length < defaultDirectory.length) {
+          localStorage.setItem("saspo_judges_db_v3", JSON.stringify(defaultDirectory));
+          return defaultDirectory;
+        }
+        return parsed;
+      } catch(e) {
+        localStorage.setItem("saspo_judges_db_v3", JSON.stringify(defaultDirectory));
+        return defaultDirectory;
+      }
+    }
+
+    function filterJudges() {
+      renderDirectory();
+    }
+
+    function clearFilters() {
+      document.getElementById("searchInput").value = "";
+      if (document.getElementById("clubFilter")) document.getElementById("clubFilter").value = "";
+      document.getElementById("categoryFilter").value = "";
+      document.getElementById("panelFilter").value = "";
+      renderDirectory();
+    }
+
+    function renderDirectory() {
+      const judges = getJudgesData();
+      const catGrid = document.getElementById("categoryJudgesGrid");
+      const examGrid = document.getElementById("examCandidatesGrid");
+
+      catGrid.innerHTML = "";
+      examGrid.innerHTML = "";
+
+      let catCount = 0;
+      let examCount = 0;
+
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
+      const selectedClub = document.getElementById("clubFilter") ? document.getElementById("clubFilter").value : "";
+      const selectedCategory = document.getElementById("categoryFilter").value;
+      const selectedPanel = document.getElementById("panelFilter").value;
+
+      judges.forEach(rawJudge => {
+        const evaluation = evaluateJudge(rawJudge.passedExams || []);
+        const j = { ...rawJudge, ...evaluation };
+
+        const matchesSearch = !searchTerm || 
+          j.name.toLowerCase().includes(searchTerm) ||
+          j.club.toLowerCase().includes(searchTerm) ||
+          (j.phone && j.phone.toLowerCase().includes(searchTerm)) ||
+          j.qualifiedCategories.some(c => c.toLowerCase().includes(searchTerm)) ||
+          j.passedExams.some(e => e.toLowerCase().includes(searchTerm));
+
+        const matchesClub = !selectedClub || j.club === selectedClub;
+        const matchesCategory = !selectedCategory || j.qualifiedCategories.includes(selectedCategory);
+        const matchesPanel = !selectedPanel || j.panel === selectedPanel;
+
+        if (!matchesSearch || !matchesClub || !matchesCategory || !matchesPanel) return;
+
+        const card = document.createElement("div");
+
+        if (j.isCategoryJudge) {
+          catCount++;
+          card.className = `judge-card ${j.panel === 'Panel A' ? 'panel-a' : 'panel-cat'}`;
+          card.innerHTML = `
+            <div>
+              <div class="judge-header">
+                <div>
+                  <div class="judge-name">${j.name}</div>
+                  <div class="judge-club">${j.club || 'SASPO Affiliated'}</div>
+                </div>
+                <span class="panel-badge ${j.panel === 'Panel A' ? 'badge-a' : 'badge-cat'}">${j.panel}</span>
+              </div>
+              <div class="contact-info">📞 ${j.phone || 'N/A'}</div>
+              <div style="font-size:0.82rem; font-weight:700; color:var(--saspo-green-dark); margin-bottom:4px;">QUALIFIED CATEGORIES:</div>
+              <div class="tag-container">
+                ${j.qualifiedCategories.map(cat => `<span class="tag tag-green">✓ ${cat}</span>`).join('')}
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm edit-btn" data-name="${j.name.replace(/"/g, '&quot;')}">✏️ Edit / Add Breeds</button>
+              <button class="btn btn-outline-danger btn-sm delete-btn" data-name="${j.name.replace(/"/g, '&quot;')}">🗑️ Delete</button>
+            </div>
+          `;
+          catGrid.appendChild(card);
+        } else {
+          examCount++;
+          card.className = "judge-card panel-e";
+          card.innerHTML = `
+            <div>
+              <div class="judge-header">
+                <div>
+                  <div class="judge-name">${j.name}</div>
+                  <div class="judge-club">${j.club || 'SASPO Affiliated'}</div>
+                </div>
+                <span class="panel-badge badge-e">${j.panel}</span>
+              </div>
+              <div class="contact-info">📞 ${j.phone || 'N/A'}</div>
+              <div style="font-size:0.82rem; font-weight:700; color:var(--muted); margin-bottom:4px;">PASSED BREED EXAMS:</div>
+              <div class="tag-container">
+                ${j.passedExams.length > 0 
+                  ? j.passedExams.map(ex => `<span class="tag tag-blue">📋 ${ex}</span>`).join('')
+                  : '<span style="font-size:0.8rem; color:var(--muted);">No breed exams passed yet.</span>'}
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm edit-btn" data-name="${j.name.replace(/"/g, '&quot;')}">✏️ Edit / Add Breeds</button>
+              <button class="btn btn-outline-danger btn-sm delete-btn" data-name="${j.name.replace(/"/g, '&quot;')}">🗑️ Delete</button>
+            </div>
+          `;
+          examGrid.appendChild(card);
+        }
+      });
+
+      document.querySelectorAll('.edit-btn').forEach(btn => btn.onclick = () => editJudgeByButton(btn));
+      document.querySelectorAll('.delete-btn').forEach(btn => btn.onclick = () => deleteJudgeByButton(btn));
+
+      document.getElementById("catJudgesCount").textContent = `${catCount} Judges`;
+      document.getElementById("examJudgesCount").textContent = `${examCount} Candidates`;
+
+      if (catCount === 0) catGrid.innerHTML = `<div class="empty-state">No category judges match your filter criteria.</div>`;
+      if (examCount === 0) examGrid.innerHTML = `<div class="empty-state">No breed exam candidates match your filter criteria.</div>`;
+    }
+
+    function resetForm() {
+      document.getElementById("judgeName").value = "";
+      document.getElementById("judgeClub").value = "";
+      document.getElementById("judgePhone").value = "";
+      document.querySelectorAll('input[type="checkbox"][data-cat]').forEach(cb => cb.checked = false);
+      calculateResults();
+      document.getElementById("judgeName").focus();
+      showToast("Form cleared for new candidate");
+    }
+
+    // Initialize App
+    renderCategories();
+    renderAllocBreedCheckboxes();
+    calculateResults();
+    document.getElementById("judgeName").addEventListener("input", calculateResults);
+  </script>
+</body>
+</html>
