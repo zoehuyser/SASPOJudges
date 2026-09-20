@@ -88,14 +88,19 @@
         <div class="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 bg-slate-100 p-1.5 sm:p-2 rounded-2xl border border-slate-200 w-full md:w-auto overflow-x-auto">
           
           <!-- Cloud Sync Badge Status -->
-          <div id="syncBadge" class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-500 shrink-0">
-            <i id="syncIcon" class="fa-solid fa-cloud text-amber-500 animate-pulse"></i>
-            <span id="syncText">Connecting...</span>
-          </div>
+        <div id="syncBadge" class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-500 shrink-0 bg-white/80 rounded-xl border border-slate-200 shadow-2xs">
+          <i id="syncIcon" class="fa-solid fa-cloud text-amber-500 animate-pulse"></i>
+          <span id="syncText">Connecting...</span>
+        </div>
 
-          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 pl-1 border-l border-slate-300 shrink-0">
-            Mode:
-          </span>
+        <button onclick="toggleInfoModal()" class="touch-target px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 shrink-0" title="Cross-Platform & Multi-Device Sync Info">
+          <i class="fa-solid fa-circle-info text-saspo-green"></i>
+          <span class="hidden sm:inline">Sync Info</span>
+        </button>
+
+        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 pl-1 border-l border-slate-300 shrink-0">
+          Mode:
+        </span>
 
           <div id="guestBadge" class="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 rounded-xl bg-slate-200 text-slate-700 text-xs font-semibold shadow-xs transition-all shrink-0">
             <i class="fa-solid fa-eye text-xs"></i> <span>Guest (View)</span>
@@ -370,20 +375,46 @@
         <p class="text-xs text-slate-500 mt-1">Enter administrative passcode to unlock Candidate Evaluator and editing capabilities.</p>
       </div>
 
-      <div class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Passcode</label>
-          <input type="password" id="adminPasscode" placeholder="Enter passcode" onkeydown="if(event.key === 'Enter') verifyPasscode()" class="touch-target w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-saspo-green">
+  <!-- Multi-Device Sync & Setup Instructions Modal -->
+  <div id="infoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-[94vw] sm:w-full p-5 sm:p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2 text-saspo-dark font-bold text-base sm:text-lg">
+          <i class="fa-solid fa-network-wired text-saspo-gold"></i>
+          <span>Live Cross-Platform Synchronization</span>
+        </div>
+        <button onclick="toggleInfoModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+        <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-start gap-3">
+          <i class="fa-solid fa-cloud-arrow-up text-saspo-green text-lg mt-0.5"></i>
+          <div>
+            <h4 class="font-bold text-emerald-900 text-xs sm:text-sm">Real-Time Cloud Synchronization Enabled</h4>
+            <p class="text-[11px] sm:text-xs text-emerald-700">Any candidate added, modified, or deleted from any mobile device, tablet, or PC will immediately synchronize and reflect live on all other connected devices without page refresh.</p>
+          </div>
         </div>
 
-        <div class="flex gap-2 pt-2">
-          <button onclick="closeAuthModal()" class="touch-target flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all border border-slate-200">
-            Cancel
-          </button>
-          <button onclick="verifyPasscode()" class="touch-target flex-1 py-2.5 bg-saspo-green hover:bg-saspo-dark active:bg-saspo-dark text-white font-bold text-xs rounded-xl transition-all shadow-xs">
-            Unlock Admin
-          </button>
+        <div class="space-y-2">
+          <h4 class="font-bold text-slate-800 text-xs sm:text-sm uppercase tracking-wider">How to test live multi-device sync:</h4>
+          <ol class="list-decimal list-inside space-y-1.5 pl-1 text-slate-600 text-xs">
+            <li>Open this portal link on your mobile phone or another browser tab.</li>
+            <li>Click <strong><i class="fa-solid fa-key text-saspo-gold"></i> Unlock Admin</strong> (Passcode: <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono text-saspo-dark font-bold">saspo123</code>).</li>
+            <li>Add, edit, or delete a candidate in the <strong>Candidate Evaluator</strong>.</li>
+            <li>Observe the candidate list update instantly across all open windows and mobile devices!</li>
+          </ol>
         </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <h4 class="font-bold text-slate-800 text-xs mb-1">Backend Connectivity & Firestore Rules:</h4>
+          <p class="text-[11px] text-slate-500">Uses Google Firestore DB with automatic fallback to local memory state if offline. Data is scoped strictly under <code class="text-slate-700 bg-white px-1 border border-slate-200 rounded">/artifacts/{appId}/public/data/judges</code>.</p>
+        </div>
+
+        <button onclick="toggleInfoModal()" class="w-full py-2.5 bg-saspo-green hover:bg-saspo-dark text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-xs">
+          Got it, Close
+        </button>
       </div>
     </div>
   </div>
@@ -597,6 +628,14 @@
 
   <!-- Standard Core Application Logic JS -->
   <script>
+    function toggleInfoModal() {
+      const modal = document.getElementById("infoModal");
+      if (modal) {
+        modal.classList.toggle("hidden");
+      }
+    }
+    window.toggleInfoModal = toggleInfoModal;
+
     // --- SASPO DATA DEFINITION ---
     const saspoData = [
       { id: "cat_1", name: "Asian Hard Feather", reqCount: 3, breeds: ["Aseel (Asil)", "Ayam Cemani", "Ayam Serama (Working Standard)", "Kinpa", "Ko-Shamo", "Kulang Aseel", "Madras Aseel", "Malay", "Nankin Shamo", "O Shamo, Chu Shamo & Bantam Shamo", "Ohiki", "Parrot Beak Long Tail Aseel (Project Status)", "Satsumadori", "Taiwan", "Thai", "The Dong Tau (Project Status)", "Tuzo", "Yakido", "Yamato Gunkei & Chibi Shamo"] },
@@ -743,49 +782,49 @@
       let panel = "Panel E";
       if (qualCount === 9) panel = "Panel A";
       else if (qualCount >= 5) panel = "Panel B";
-      else if (qualCount >= 3) panel = "Panel C";
-      else if (qualCount >= 1) panel = "Panel D";
-      else panel = "Panel E";
+      onAuthStateChanged(auth, (user) => {
+        if (!user) return;
 
-      return { qualifiedCategories, panel, isCategoryJudge: qualCount > 0 };
-    }
+        // Real-time listener across ALL connected devices
+        onSnapshot(
+          judgesCollectionRef,
+          (snapshot) => {
+            const judgesList = [];
+            snapshot.forEach((docSnap) => {
+              const data = docSnap.data();
+              judgesList.push({ id: docSnap.id, ...data });
+            });
 
-    function renderCategories() {
-      const container = document.getElementById("categoryContainer");
-      if (!container) return;
-      container.innerHTML = "";
+            const prevCount = window.cloudJudges ? window.cloudJudges.length : 0;
+            window.cloudJudges = judgesList;
 
-      saspoData.forEach((cat) => {
-        const accordion = document.createElement("div");
-        accordion.className = "border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs";
-        
-        const header = document.createElement("div");
-        header.className = "touch-target p-3 bg-slate-50 hover:bg-slate-100 active:bg-slate-200 cursor-pointer font-bold text-xs sm:text-sm text-slate-700 flex justify-between items-center transition-all select-none border-l-4 border-saspo-green";
-        header.innerHTML = `
-          <span class="pr-2">${cat.name} (${cat.breeds.length} breeds)</span>
-          <span class="px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-extrabold bg-slate-200 text-slate-600 shrink-0" id="badge-${cat.id}">0 / ${cat.reqCount}</span>
-        `;
-        header.onclick = () => {
-          const body = accordion.querySelector(".acc-body");
-          body.classList.toggle("hidden");
-        };
+            // Update UI status to Active Realtime Sync
+            const syncIcon = document.getElementById("syncIcon");
+            const syncText = document.getElementById("syncText");
 
-        const body = document.createElement("div");
-        body.className = "acc-body p-3 hidden bg-white grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 border-t border-slate-100";
+            if (syncIcon && syncText) {
+              syncIcon.className = "fa-solid fa-cloud-check text-emerald-500 animate-none";
+              syncText.textContent = "Live Cloud Sync Active";
+              syncText.className = "text-emerald-700 font-semibold";
+            }
 
-        cat.breeds.forEach((breed) => {
-          const label = document.createElement("label");
-          label.className = "flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer hover:text-saspo-dark p-2 rounded-md hover:bg-slate-50 touch-target";
-          label.innerHTML = `
-            <input type="checkbox" data-cat="${cat.id}" value="${breed}" ${!isAdmin ? 'disabled' : ''} onchange="calculateResults()" class="w-4 h-4 rounded border-slate-300 text-saspo-green focus:ring-saspo-green disabled:opacity-50 disabled:cursor-not-allowed">
-            <span>${breed}</span>
-          `;
-          body.appendChild(label);
-        });
+            // Refresh directory and filter options dynamically
+            if (typeof window.populateDirectoryDropdowns === 'function') {
+              window.populateDirectoryDropdowns();
+            }
+            if (typeof window.renderDirectory === 'function') {
+              window.renderDirectory();
+            }
 
-        accordion.appendChild(header);
-        accordion.appendChild(body);
-        container.appendChild(accordion);
+            if (prevCount !== 0 && prevCount !== judgesList.length) {
+              showToast("Directory synchronized in real-time!");
+            }
+          },
+          (error) => {
+            console.warn("Firestore real-time sync error, using local state:", error);
+            setOfflineMode("Sync Offline");
+          }
+        );
       });
     }
 
